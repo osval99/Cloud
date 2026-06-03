@@ -304,15 +304,18 @@ def consultar_usuario(archivo, hoja, df, motivo_fallo):
 #  PROCESO PRINCIPAL
 # ─────────────────────────────────────────────
 
-def procesar():
+def procesar(modo_auto=False, archivos_especificos=None):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(script_dir)
 
-    archivos = sorted([
-        f for f in glob.glob("*.xls*")
-        if not any(x in f.lower() for x in ['resultado', 'duplicado', 'duda', 'conflict'])
-        and not os.path.basename(f).startswith("~$")
-    ])
+    if archivos_especificos:
+        archivos = sorted([f for f in archivos_especificos if os.path.exists(f)])
+    else:
+        archivos = sorted([
+            f for f in glob.glob("*.xls*")
+            if not any(x in f.lower() for x in ['resultado', 'duplicado', 'duda', 'conflict'])
+            and not os.path.basename(f).startswith("~$")
+        ])
 
     if not archivos:
         print("[AVISO] No se encontraron archivos Excel para procesar.")
@@ -376,6 +379,15 @@ def procesar():
                     col_isbn, col_precio, col_titulo, motivo_fallo = detectar_columnas_estricto(df)
 
                     if motivo_fallo:
+                        if modo_auto:
+                            print(f"     [AUTO] No se pudo detectar columnas: {motivo_fallo} — enviado a DUDAS")
+                            lista_dudas.append({
+                                'Archivo': archivo, 'Hoja': hoja,
+                                'Motivo': motivo_fallo,
+                                'Columnas': ', '.join(f"[{i}]{str(c)[:20]}"
+                                                      for i, c in enumerate(df.columns[:15]))
+                            })
+                            continue
                         # Consultar al usuario
                         col_isbn, col_precio, col_titulo = consultar_usuario(
                             archivo, hoja, df, motivo_fallo)
@@ -468,4 +480,7 @@ def procesar():
     print(f"\n[LISTO] PROCESO COMPLETADO.\n")
 
 if __name__ == "__main__":
-    procesar()
+    modo_auto = "--auto" in sys.argv
+    # Archivos específicos pasados como argumentos (excluyendo flags)
+    archivos_args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    procesar(modo_auto=modo_auto, archivos_especificos=archivos_args if archivos_args else None)
