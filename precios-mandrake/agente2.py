@@ -454,21 +454,14 @@ def procesar(modo_auto=False, archivos_especificos=None):
     if lista_final:
         resultado = pd.concat(lista_final, ignore_index=True).drop_duplicates()
 
-        conflictos = resultado.groupby('ISBN').filter(lambda x: x['Precio'].nunique() > 1)
-        isbns_conf = set(conflictos['ISBN'])
-        limpio = (resultado[~resultado['ISBN'].isin(isbns_conf)]
-                  .drop_duplicates(subset='ISBN')
-                  [['ISBN', 'Titulo', 'Precio', 'Origen']])
+        # Tomar siempre el precio más alto para cada ISBN
+        resultado_max = (resultado.sort_values('Precio', ascending=False)
+                         .drop_duplicates(subset='ISBN')
+                         [['ISBN', 'Titulo', 'Precio', 'Origen']])
 
         nombre_out = f"RESULTADO_FINAL_{ts}.xlsx"
-        limpio.to_excel(nombre_out, index=False)
-        print(f"[OK] Resultado principal : {nombre_out}  ({len(limpio)} registros)")
-
-        if not conflictos.empty:
-            nombre_conf = f"CONFLICTOS_PRECIO_{ts}.xlsx"
-            conflictos.sort_values('ISBN').to_excel(nombre_conf, index=False)
-            print(f"[AVISO] Conflictos de precio: {nombre_conf}  "
-                  f"({conflictos['ISBN'].nunique()} ISBNs)")
+        resultado_max.to_excel(nombre_out, index=False)
+        print(f"[OK] Resultado principal : {nombre_out}  ({len(resultado_max)} registros)")
     else:
         print("[AVISO] No se genero resultado.")
 
