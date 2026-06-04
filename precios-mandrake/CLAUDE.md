@@ -25,7 +25,7 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
 - El pipeline procesa **solo** los archivos recién bajados del mail, no los que ya están en la carpeta
 - **Conflictos de precio**: tomar siempre el precio más alto — el script ya lo hace automáticamente
 - Al terminar el pipeline se mueven a `Procesados\`: archivos descargados + RESULTADO_FINAL + DUDAS
-- Si se pide resolver un archivo de conflictos manualmente, generar **solo** un archivo con los ISBNs conflictivos resueltos — **no mezclar con el resultado anterior**
+- Si se pide resolver un archivo de conflictos manualmente, generar **solo** un archivo con los ISBNs conflictivos resueltos (pueden ser cualquier cantidad) — **no mezclar con el resultado anterior**
 - Los archivos Excel de entrada pueden tener múltiples hojas; solo procesar las que son listas de precios
 
 ## Mejoras pendientes al script
