@@ -119,19 +119,6 @@ function EscanerFierro() {
               return updated;
             });
             stopCamera();
-            try {
-              await navigator.clipboard.writeText(found);
-            } catch (_) {
-              const ta = document.createElement("textarea");
-              ta.value = found;
-              document.body.appendChild(ta);
-              ta.select();
-              document.execCommand("copy");
-              document.body.removeChild(ta);
-            }
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-            window.open("https://fierro-mandrake.web.app/", "_blank", "noopener,noreferrer");
             return;
           }
         } catch (_) {
@@ -155,25 +142,23 @@ function EscanerFierro() {
     }
   }, [stopCamera]);
 
-  const copyToClipboard = useCallback(async (text) => {
+  const copyAndOpenFierro = useCallback(async (text) => {
+    let ok = false;
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      ok = true;
     } catch {
       const ta = document.createElement("textarea");
       ta.value = text;
       document.body.appendChild(ta);
+      ta.focus();
       ta.select();
-      document.execCommand("copy");
+      ok = document.execCommand("copy");
       document.body.removeChild(ta);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     }
-  }, []);
-
-  const openFierro = useCallback(() => {
+    setCopied(ok);
     window.open("https://fierro-mandrake.web.app/", "_blank", "noopener,noreferrer");
+    if (ok) setTimeout(() => setCopied(false), 2000);
   }, []);
 
   return (
@@ -291,35 +276,20 @@ function EscanerFierro() {
               {code}
             </div>
 
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button
-                onClick={() => copyToClipboard(code)}
-                style={{
-                  flex: 1, padding: "12px 8px",
-                  backgroundColor: copied ? COLORS.green : COLORS.plum,
-                  color: COLORS.white,
-                  border: "none", borderRadius: 8,
-                  fontSize: 14, fontWeight: "bold",
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                }}
-              >
-                {copied ? "✓ Copiado" : "Copiar"}
-              </button>
-              <button
-                onClick={openFierro}
-                style={{
-                  flex: 1, padding: "12px 8px",
-                  backgroundColor: COLORS.dorado,
-                  color: COLORS.plum,
-                  border: "none", borderRadius: 8,
-                  fontSize: 14, fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                Abrir Fierro
-              </button>
-            </div>
+            <button
+              onClick={() => copyAndOpenFierro(code)}
+              style={{
+                width: "100%", padding: "14px 8px", marginTop: 12,
+                backgroundColor: copied ? COLORS.green : COLORS.dorado,
+                color: COLORS.plum,
+                border: "none", borderRadius: 8,
+                fontSize: 15, fontWeight: "bold",
+                cursor: "pointer",
+                transition: "background-color 0.2s",
+              }}
+            >
+              {copied ? "✓ Copiado — abriendo Fierro" : "Copiar y abrir Fierro"}
+            </button>
           </div>
         )}
 
