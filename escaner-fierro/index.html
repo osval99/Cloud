@@ -119,6 +119,19 @@ function EscanerFierro() {
               return updated;
             });
             stopCamera();
+            try {
+              await navigator.clipboard.writeText(found);
+            } catch (_) {
+              const ta = document.createElement("textarea");
+              ta.value = found;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand("copy");
+              document.body.removeChild(ta);
+            }
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+            window.open("https://fierro-mandrake.web.app/", "_blank", "noopener,noreferrer");
             return;
           }
         } catch (_) {
