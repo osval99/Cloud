@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Escáner Fierro</title>
+<meta name="theme-color" content="#2D1B36" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<style>
+  html, body, #root { margin: 0; padding: 0; height: 100%; }
+  body { background: #F7F3EE; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useRef, useCallback, useEffect } = React;
+
+const COLORS = {
+  plum: "#2D1B36",
+  plumLight: "#3d2a48",
+  dorado: "#C9A84C",
+  crema: "#F7F3EE",
+  white: "#FFFFFF",
+  red: "#c0392b",
+  green: "#27ae60",
+};
+
+function EscanerFierro() {
+  const [scanning, setScanning] = useState(false);
+  const [code, setCode] = useState(null);
+  const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [history, setHistory] = useState([]);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const detectorRef = useRef(null);
+  const animFrameRef = useRef(null);
+
+  const stopCamera = useCallback(() => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setScanning(false);
+  }, []);
+
+  useEffect(() => {
+    return () => stopCamera();
+  }, [stopCamera]);
+
+  const startCamera = useCallback(async () => {
+    setError(null);
+    setCode(null);
+    setCopied(false);
+
+    if (!("BarcodeDetector" in window)) {
+      setError(
+        "Tu navegador no soporta BarcodeDetector. Usá Chrome en Android."
+      );
+      return;
+    }
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+
+      detectorRef.current = new window.BarcodeDetector({
+        formats: ["ean_13", "ean_8", "code_128", "code_39", "upc_a", "upc_e", "qr_code"],
+      });
+
+      const track = stream.getVideoTracks()[0];
+      if (track) {
+        track.addEventListener("ended", () => {
+          stopCamera();
+          setError("Se perdió la conexión con la cámara. Probá escanear de nuevo.");
+        });
+      }
+
+      setScanning(true);
+
+      let failCount = 0;
+      const detect = async () => {
+        if (!videoRef.current || !detectorRef.current || !streamRef.current) return;
+        try {
+          const barcodes = await detectorRef.current.detect(videoRef.current);
+          failCount = 0;
+          if (barcodes.length > 0) {
+            const found = barcodes[0].rawValue;
+            setCode(found);
+            setHistory((prev) => {
+              const updated = [
+                { code: found, time: new Date().toLocaleTimeString() },
+                ...prev.filter((h) => h.code !== found),
+              ].slice(0, 20);
+              return updated;
+            });
+            stopCamera();
+            return;
+          }
+        } catch (_) {
+          failCount += 1;
+          if (failCount > 30) {
+            stopCamera();
+            setError("Se interrumpió el escaneo. Probá de nuevo.");
+            return;
+          }
+        }
+        animFrameRef.current = requestAnimationFrame(detect);
+      };
+
+      animFrameRef.current = requestAnimationFrame(detect);
+    } catch (err) {
+      if (stream) {
+        stream.getTracks().forEach((t) => t.stop());
+      }
+      streamRef.current = null;
+      setError("No se pudo acceder a la cámara. Verificá los permisos.");
+    }
+  }, [stopCamera]);
+
+  const copyToClipboard = useCallback(async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, []);
+
+  const openFierro = useCallback(() => {
+    window.open("https://fierro-mandrake.web.app/", "_blank", "noopener,noreferrer");
+  }, []);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      backgroundColor: COLORS.crema,
+      fontFamily: "Arial, sans-serif",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      <div style={{
+        background: COLORS.plum,
+        padding: "16px 20px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <div>
+          <div style={{ color: COLORS.dorado, fontSize: 20, fontWeight: "bold", letterSpacing: 1 }}>
+            MANDRAKE
+          </div>
+          <div style={{ color: COLORS.crema, fontSize: 12, opacity: 0.8, marginTop: 2 }}>
+            Escáner → Fierro
+          </div>
+        </div>
+        <div style={{
+          width: 36, height: 36, borderRadius: "50%",
+          border: `2px solid ${COLORS.dorado}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: COLORS.dorado, fontSize: 18,
+        }}>
+          ⌗
+        </div>
+      </div>
+
+      <div style={{ flex: 1, padding: "20px 16px", maxWidth: 480, margin: "0 auto", width: "100%" }}>
+
+        <div style={{
+          backgroundColor: "#000",
+          borderRadius: 12,
+          overflow: "hidden",
+          position: "relative",
+          aspectRatio: "4/3",
+          marginBottom: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <video
+            ref={videoRef}
+            style={{
+              width: "100%", height: "100%",
+              objectFit: "cover",
+              display: scanning ? "block" : "none",
+            }}
+            playsInline
+            muted
+          />
+
+          {!scanning && !code && (
+            <div style={{ textAlign: "center", padding: 32 }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>📷</div>
+              <div style={{ color: COLORS.crema, fontSize: 14 }}>
+                Tocá el botón para escanear
+              </div>
+            </div>
+          )}
+
+          {!scanning && code && (
+            <div style={{ textAlign: "center", padding: 32 }}>
+              <div style={{ fontSize: 48, marginBottom: 8 }}>✅</div>
+              <div style={{ color: COLORS.dorado, fontSize: 14, fontWeight: "bold" }}>
+                Código detectado
+              </div>
+            </div>
+          )}
+
+          {scanning && (
+            <div style={{
+              position: "absolute", top: "50%", left: "10%", right: "10%",
+              height: 2, backgroundColor: COLORS.dorado,
+              boxShadow: `0 0 12px ${COLORS.dorado}`,
+              animation: "scanLine 2s ease-in-out infinite",
+              transform: "translateY(-50%)",
+            }} />
+          )}
+        </div>
+
+        {error && (
+          <div style={{
+            backgroundColor: "#fde8e8", border: `1px solid ${COLORS.red}`,
+            borderRadius: 8, padding: 12, marginBottom: 16,
+            color: COLORS.red, fontSize: 13,
+          }}>
+            {error}
+          </div>
+        )}
+
+        {code && (
+          <div style={{
+            backgroundColor: COLORS.white,
+            border: `2px solid ${COLORS.dorado}`,
+            borderRadius: 10, padding: 16, marginBottom: 16,
+            textAlign: "center",
+          }}>
+            <div style={{ fontSize: 11, color: "#888", marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>
+              Código escaneado
+            </div>
+            <div style={{
+              fontSize: 26, fontWeight: "bold",
+              color: COLORS.plum, letterSpacing: 2,
+              fontFamily: "monospace",
+              padding: "8px 0",
+            }}>
+              {code}
+            </div>
+
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <button
+                onClick={() => copyToClipboard(code)}
+                style={{
+                  flex: 1, padding: "12px 8px",
+                  backgroundColor: copied ? COLORS.green : COLORS.plum,
+                  color: COLORS.white,
+                  border: "none", borderRadius: 8,
+                  fontSize: 14, fontWeight: "bold",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                }}
+              >
+                {copied ? "✓ Copiado" : "Copiar"}
+              </button>
+              <button
+                onClick={openFierro}
+                style={{
+                  flex: 1, padding: "12px 8px",
+                  backgroundColor: COLORS.dorado,
+                  color: COLORS.plum,
+                  border: "none", borderRadius: 8,
+                  fontSize: 14, fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                Abrir Fierro
+              </button>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={scanning ? stopCamera : startCamera}
+          style={{
+            width: "100%", padding: 16,
+            backgroundColor: scanning ? COLORS.red : COLORS.dorado,
+            color: scanning ? COLORS.white : COLORS.plum,
+            border: "none", borderRadius: 10,
+            fontSize: 16, fontWeight: "bold",
+            cursor: "pointer",
+            marginBottom: 20,
+            transition: "background-color 0.2s",
+          }}
+        >
+          {scanning ? "⏹ Detener" : "📷 Escanear código"}
+        </button>
+
+        {history.length > 0 && (
+          <div>
+            <div style={{
+              fontSize: 12, color: "#888",
+              textTransform: "uppercase", letterSpacing: 1,
+              marginBottom: 8, paddingLeft: 4,
+            }}>
+              Últimos escaneados
+            </div>
+            {history.map((item, i) => (
+              <div
+                key={item.code + i}
+                onClick={() => {
+                  setCode(item.code);
+                  setCopied(false);
+                }}
+                style={{
+                  display: "flex", justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "10px 12px",
+                  backgroundColor: COLORS.white,
+                  borderRadius: 8, marginBottom: 4,
+                  cursor: "pointer",
+                  border: code === item.code ? `2px solid ${COLORS.dorado}` : "1px solid #e0dcd6",
+                  transition: "border-color 0.15s",
+                }}
+              >
+                <span style={{
+                  fontFamily: "monospace", fontSize: 15,
+                  fontWeight: "bold", color: COLORS.plum,
+                }}>
+                  {item.code}
+                </span>
+                <span style={{ fontSize: 11, color: "#999" }}>{item.time}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes scanLine {
+          0%, 100% { top: 25%; }
+          50% { top: 75%; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<EscanerFierro />);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
