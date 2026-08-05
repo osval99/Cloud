@@ -43,6 +43,7 @@ function EscanerFierro() {
   const streamRef = useRef(null);
   const detectorRef = useRef(null);
   const animFrameRef = useRef(null);
+  const fierroWindowRef = useRef(null);
 
   const stopCamera = useCallback(() => {
     if (animFrameRef.current) {
@@ -157,7 +158,13 @@ function EscanerFierro() {
       document.body.removeChild(ta);
     }
     setCopied(ok);
-    window.open("https://fierro-mandrake.web.app/", "_blank", "noopener,noreferrer");
+
+    if (fierroWindowRef.current && !fierroWindowRef.current.closed) {
+      fierroWindowRef.current.focus();
+    } else {
+      fierroWindowRef.current = window.open("https://fierro-mandrake.web.app/", "fierro-tab");
+    }
+
     if (ok) setTimeout(() => setCopied(false), 2000);
   }, []);
 
