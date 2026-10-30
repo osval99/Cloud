@@ -18,7 +18,9 @@ Al terminar cada tarea, antes del commit final:
 - Si la carpeta no tiene `CLAUDE.md`, crearlo.
 - Si cambia algo general (un proyecto nuevo, una preferencia), actualizar este archivo.
 - Borrar lo que quedó obsoleto; no acumular historial.
-- Subir el cambio junto con el trabajo y avisar al usuario que debe mergear el PR.
+- Subir el cambio junto con el trabajo y abrir el PR contra `add-readme` (la rama principal).
+- Terminar siempre la sesión con un recordatorio, en el chat y en la notificación al celular:
+  `Recordá mergear el PR: <link al PR>`.
 
 ## Proyectos
 | Carpeta | Descripción |
