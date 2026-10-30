@@ -11,6 +11,15 @@ Cada carpeta puede tener su propio `CLAUDE.md` con el detalle; leerlo antes de t
 - Ante una tarea nueva, hacer primero las preguntas necesarias para realizarla bien.
 - Al terminar un trabajo, enviar notificación a la app del celular.
 
+## Mantener el contexto al día
+Al terminar cada tarea, antes del commit final:
+- Actualizar el `CLAUDE.md` de la carpeta trabajada con lo nuevo: decisiones tomadas,
+  estado actual, pendientes y datos que hagan falta en la próxima sesión.
+- Si la carpeta no tiene `CLAUDE.md`, crearlo.
+- Si cambia algo general (un proyecto nuevo, una preferencia), actualizar este archivo.
+- Borrar lo que quedó obsoleto; no acumular historial.
+- Subir el cambio junto con el trabajo y avisar al usuario que debe mergear el PR.
+
 ## Proyectos
 | Carpeta | Descripción |
 |---------|-------------|
