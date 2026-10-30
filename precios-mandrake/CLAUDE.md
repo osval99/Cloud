@@ -10,7 +10,7 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
 ## Scripts
 | Script | Función |
 |--------|---------|
-| `actualizar_precios.py` | Pipeline completo: baja adjuntos → procesa → mueve → marca RESUELTO en Gmail |
+| `actualizar_precios.py` | Pipeline completo: baja adjuntos de mails con etiqueta `PRECIOS PARA ACTUALIZAR` → procesa → mueve → les pone `Resuelto` y les saca la etiqueta |
 | `agente2.py` | Procesa archivos Excel y genera resultado. Acepta `--auto` (sin preguntas) y lista de archivos específicos |
 | `bajar_adjuntos.py` | Solo descarga adjuntos del mail (sin procesar) |
 
@@ -19,7 +19,9 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
 - `token.json` — se genera automáticamente al autenticarse por primera vez
 - Usuario de prueba OAuth: `actualizar.mandrakelibros@gmail.com`
 - Proyecto Google Cloud: `mandrake-precios`
-- Etiqueta Gmail RESUELTO: `Label_2923983642399414539`
+- Las etiquetas se buscan **por nombre** (`PRECIOS PARA ACTUALIZAR`, `Resuelto`), no por ID: los IDs cambian entre cuentas.
+- Las listas a actualizar llegan a **mandrake.dis@gmail.com** con la etiqueta `PRECIOS PARA ACTUALIZAR`.
+  El token debe estar autorizado con esa cuenta (si `token.json` es de otra, borrarlo y reautenticar). El script imprime la cuenta usada.
 
 ## Convenciones y reglas importantes
 - El pipeline procesa **solo** los archivos recién bajados del mail, no los que ya están en la carpeta
@@ -42,6 +44,15 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
 ## Mejoras pendientes al script
 1. Descartar automáticamente hojas que no son listas de precios (Editoriales, Puntos de venta, Contactos)
 2. Mostrar ISBN pre-detectado cuando el precio es ambiguo
+
+## Tanda noviembre 2026 (pendiente de correr, 30/10/2026)
+33 mails con la etiqueta. No se procesaron: desde la nube no se pueden bajar adjuntos (el conector Gmail no baja archivos)
+ni abrir links externos (bloqueados por la red del entorno). Hay que correr `actualizar_precios.py` en la PC.
+- **Lista por link, bajar a mano**: Coma Cuatro (Drive, El Cuenco de Plata), Abrazandocuentos, Del Naranjo,
+  Manolito (Mega Atlas, promo $29.900), FCE (lista PVP), Sigmar (botón en el mail).
+- **Precio en el cuerpo del mail** (cargar a mano): 9789875589964 Amancio Williams (UNL) → $40.000;
+  9786313001170 Tarot para colorear → $30.000.
+- **Promos, no lista**: Librum (promos nov-dic), FCE (10 títulos a $18.000).
 
 ## Google Apps Script (bajar adjuntos de Gmail)
 - **Cuenta**: actualizar.mandrakelibros@gmail.com
