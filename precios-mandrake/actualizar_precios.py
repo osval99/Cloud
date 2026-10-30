@@ -4,7 +4,9 @@ Pipeline completo de actualización de precios:
 1. Baja adjuntos Excel/ODS del mail
 2. Procesa con agente2.py en modo automático
 3. Mueve archivos procesados a Procesados/
-4. Marca los mails como RESUELTO en Gmail
+4. Marca los mails como Resuelto y les quita la etiqueta PRECIOS PARA ACTUALIZAR
+
+Solo toma mails con la etiqueta PRECIOS PARA ACTUALIZAR.
 """
 
 import os
@@ -26,7 +28,17 @@ TOKEN_FILE = os.path.join(BASE_DIR, 'token.json')
 CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
 PROCESADOS_DIR = os.path.join(BASE_DIR, 'Procesados')
 EXTENSIONES = ('.xlsx', '.xls', '.ods', '.csv')
-LABEL_RESUELTO = 'Label_2923983642399414539'
+ETIQUETA_PENDIENTE = 'PRECIOS PARA ACTUALIZAR'
+ETIQUETA_RESUELTO = 'Resuelto'
+
+
+def buscar_label_id(service, nombre):
+    """Devuelve el ID de una etiqueta por nombre (sin distinguir mayúsculas)."""
+    labels = service.users().labels().list(userId='me').execute().get('labels', [])
+    for l in labels:
+        if l['name'].lower() == nombre.lower():
+            return l['id']
+    return None
 
 
 def autenticar():
@@ -44,14 +56,21 @@ def autenticar():
     return creds
 
 
-def bajar_adjuntos(service):
+def bajar_adjuntos(service, label_pendiente):
     print("\n" + "="*60)
     print("PASO 1: Bajando adjuntos del mail")
     print("="*60)
 
-    query = 'has:attachment (filename:xlsx OR filename:xls OR filename:ods OR filename:csv) -label:RESUELTO'
-    results = service.users().messages().list(userId='me', q=query).execute()
-    mensajes = results.get('messages', [])
+    query = ('has:attachment (filename:xlsx OR filename:xls OR filename:ods OR filename:csv) '
+             f'-label:"{ETIQUETA_RESUELTO}"')
+    mensajes, page = [], None
+    while True:
+        results = service.users().messages().list(
+            userId='me', q=query, labelIds=[label_pendiente], pageToken=page).execute()
+        mensajes += results.get('messages', [])
+        page = results.get('nextPageToken')
+        if not page:
+            break
 
     if not mensajes:
         print("No hay correos nuevos con adjuntos.")
@@ -138,7 +157,7 @@ def mover_a_procesados(archivos_descargados):
     print(f"Total movidos: {movidos} archivos.")
 
 
-def marcar_resuelto(service, ids_mensajes):
+def marcar_resuelto(service, ids_mensajes, label_pendiente, label_resuelto):
     print("\n" + "="*60)
     print("PASO 4: Marcando mails como RESUELTO")
     print("="*60)
@@ -147,7 +166,7 @@ def marcar_resuelto(service, ids_mensajes):
         service.users().messages().modify(
             userId='me',
             id=msg_id,
-            body={'addLabelIds': [LABEL_RESUELTO]}
+            body={'addLabelIds': [label_resuelto], 'removeLabelIds': [label_pendiente]}
         ).execute()
         print(f"  ✓ Mail {msg_id} marcado como RESUELTO")
 
@@ -162,8 +181,19 @@ def main():
 
     creds = autenticar()
     service = build('gmail', 'v1', credentials=creds)
+    cuenta = service.users().getProfile(userId='me').execute()['emailAddress']
+    print(f"Cuenta: {cuenta}")
 
-    ids_procesados, archivos_descargados = bajar_adjuntos(service)
+    label_pendiente = buscar_label_id(service, ETIQUETA_PENDIENTE)
+    if not label_pendiente:
+        print(f"[ERROR] La cuenta no tiene la etiqueta '{ETIQUETA_PENDIENTE}'.")
+        return
+    label_resuelto = buscar_label_id(service, ETIQUETA_RESUELTO)
+    if not label_resuelto:
+        label_resuelto = service.users().labels().create(
+            userId='me', body={'name': ETIQUETA_RESUELTO}).execute()['id']
+
+    ids_procesados, archivos_descargados = bajar_adjuntos(service, label_pendiente)
 
     if not ids_procesados:
         print("\nNo hay nada nuevo para procesar. Fin.")
@@ -174,7 +204,7 @@ def main():
     mover_a_procesados(archivos_descargados)
 
     if ok:
-        marcar_resuelto(service, ids_procesados)
+        marcar_resuelto(service, ids_procesados, label_pendiente, label_resuelto)
 
     print("\n" + "="*60)
     print("PROCESO COMPLETADO.")
