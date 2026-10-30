@@ -28,6 +28,22 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
 - Si se pide resolver un archivo de conflictos manualmente, generar **solo** un archivo con los ISBNs conflictivos resueltos (pueden ser cualquier cantidad) — **no mezclar con el resultado anterior**
 - Los archivos Excel de entrada pueden tener múltiples hojas; solo procesar las que son listas de precios
 
+## Estado actual
+- **Último resultado**: `RESULTADO_FINAL_1531.xlsx` (26.539 registros)
+- **Conflictos pendientes**: `CONFLICTOS_PRECIO_1531.xlsx`
+- **Archivos en duda**: carpeta `DUDAS\` (pendientes de procesar)
+
+### Conflictos manuales sin resolver
+| ISBN | Problema | Fuente |
+|------|----------|--------|
+| 9789871374915 | Dos precios: $23.000 y $37.500 | Carbono |
+| 9789872349417 | Mismo ISBN, dos títulos distintos | Herramienta |
+
 ## Mejoras pendientes al script
 1. Descartar automáticamente hojas que no son listas de precios (Editoriales, Puntos de venta, Contactos)
 2. Mostrar ISBN pre-detectado cuando el precio es ambiguo
+
+## Google Apps Script (bajar adjuntos de Gmail)
+- **Cuenta**: actualizar.mandrakelibros@gmail.com
+- **Etiqueta Gmail**: `precios-para-actualizar`
+- **Bug pendiente**: `getUserLabelByName()` devuelve `null` — la etiqueta no se está resolviendo correctamente
