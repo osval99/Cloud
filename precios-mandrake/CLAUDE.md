@@ -30,9 +30,32 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
 - Si se pide resolver un archivo de conflictos manualmente, generar **solo** un archivo con los ISBNs conflictivos resueltos (pueden ser cualquier cantidad) — **no mezclar con el resultado anterior**
 - Los archivos Excel de entrada pueden tener múltiples hojas; solo procesar las que son listas de precios
 
+## Reglas del proyecto "Listas De Precios" (claude.ai, memoria al 2/10/2026)
+- Salida: `RESULTADO_FINAL_<hora>.csv` UTF-8, separador **coma** (con punto y coma no carga en Fierro),
+  4 columnas: ISBN, Precio (entero), Titulo, Origen. Para Fierro se divide en tandas de ~5.000 filas.
+- **Consultar al usuario las decisiones editoriales** antes de cerrar: qué columna de precio usar si hay varias,
+  promo vs. PVP normal, identidad dudosa de una distribuidora. Decisiones ya tomadas:
+  - Si hay PVP viejo y PVP nuevo, siempre el nuevo.
+  - Las promos de distribuidoras (ej. Librum "Promos nov-dic") se cargan.
+  - El Ateneo manda precios muy bajos (< $1.000) de libros descatalogados: no se cargan.
+- DUDAS suele traer hojas vacías ("out-of-bounds"): no requieren acción.
+- `agente2_config.json` guarda los mapeos por `archivo|hoja`. Si no hay entrada exacta, el script busca una
+  de un archivo parecido (mismas palabras sin fecha/mes/remitente) y misma hoja, y la usa solo si el contenido
+  valida (ISBN y precios razonables). Hojas marcadas `descartado` se omiten.
+
+## Cargar precios en Fierro
+Ventas > Listas de precios > LISTA MOSTRADOR > Precios > ícono "Importar precios desde un archivo".
+Formato del archivo: **Personalizado** (CSV), separador coma, fin de línea Windows, empezar desde línea 2.
+Vincular por **ISBN**, columna 1. **No** tildar "Actualizar el precio si se encuentra más de un libro con el
+mismo código" (hay libros duplicados, ej. gemelos outlet). Ir paso a paso con el usuario; Aceptar/Aplicar solo
+con su visto bueno. Tandas en `~/fierro-claude/importaciones/precios_nov2026/`.
+
 ## Validación de ISBN (agente2.py)
 - El ISBN es casi siempre de **13 dígitos** (rara vez 10). Si la columna elegida tiene mayormente ISBN-10
   y hay otra con ISBN-13 (978/979), se usa la de 13 (también sobre la config guardada).
+- Solo valen ISBN-13 con prefijo **978/979**; los ISBN-10 válidos se convierten a ISBN-13. Los demás códigos
+  (779…, 750…, 290…) van a `ISBN_INVALIDOS_<hora>.xlsx` con el motivo.
+- Se descartan las filas ocultas de los Excel.
 - Se verifica el **dígito de control** (ISBN-13: pesos 1/3 mód. 10; ISBN-10: pesos 10..1 mód. 11, X=10).
   Los que no validan van a `ISBN_INVALIDOS_<hora>.xlsx`, no al resultado.
 - Un valor con letras (ej. código interno "0084PT0000") no se toma como precio.
@@ -45,19 +68,14 @@ El script solo baja adjuntos. Las listas por link se bajan resolviendo el link d
 Google Sheets: `.../export?format=xlsx`; Drive: `drive.google.com/uc?export=download&id=<ID>`.
 Se guardan en `Procesados/` como `2026-10-31 [link] <nombre>.xlsx` y se procesan junto con los adjuntos.
 
-## Estado actual (31/10/2026) — tanda noviembre 2026: COMPLETA
+## Estado actual (31/10/2026) — tanda noviembre 2026
 Corrida en la PC Linux `/home/oficina1/Cloud/precios-mandrake/`, cuenta mandrake.dis@gmail.com.
-Los 34 mails de la etiqueta quedaron con `Resuelto` (no queda ninguno pendiente).
+Los 34 mails de la etiqueta quedaron con `Resuelto`.
 - 37 adjuntos (25 mails) + 6 listas por link (Coma Cuatro, FCE, Sigmar, Abrazandocuentos, Del Naranjo, Manolito).
-- **Resultado**: `RESULTADO_FINAL_1350.xlsx` (36.655 registros: 36.572 ISBN-13, 83 ISBN-10).
-- `PRECIOS_CUERPO_MAIL.xlsx`: 9789875589964 Amancio Williams (UNL) $40.000; 9786313001170 Tarot para colorear $30.000.
-- `ISBN_INVALIDOS_1350.xlsx`: 294 filas con dígito verificador incorrecto — revisar.
-- `DUDAS_1350.xlsx`: 19 hojas sin procesar:
-  - Galerna / Aurelia Rivera (2 mails), Cien Flores, Herramienta (jaossanna): error "out-of-bounds".
-  - AKAL (facturacion): precio ambiguo "Precio $ Actual" vs "PVP PESOS FINAL".
-  - Sigmar "Por colección" (x2, mismo contenido que "Por Título") y Herramienta (2 hojas): sin columna ISBN.
-- Revisar: 7 precios < $1.000 de El Ateneo (ISBN 978958…, Colombia) — ¿moneda distinta?
-- Se procesó "Promos nov-dic.xlsx" (Librum) y la promo Manolito ($29.900): son promos — revisar si van.
+- **Resultado**: `RESULTADO_FINAL_1418.csv` (36.538) + `PRECIOS_CUERPO_MAIL.xlsx` (2) → 8 tandas en
+  `~/fierro-claude/importaciones/precios_nov2026/` (36.532 precios; sin los 7 descatalogados de El Ateneo).
+- `ISBN_INVALIDOS_1418.xlsx`: 430 filas que no son ISBN válidos. `DUDAS_1418.xlsx`: 17, todas hojas vacías o repetidas.
+- **Carga en Fierro: pendiente**, se hace paso a paso con el usuario.
 - `Descartados/`: corridas anteriores con errores. No usar.
 
 ### Pendientes
