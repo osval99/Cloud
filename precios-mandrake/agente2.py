@@ -33,6 +33,8 @@ def guardar_config(config):
 def limpiar_precio_ar(valor):
     if pd.isna(valor) or valor == '': return 0.0
     if isinstance(valor, (int, float)): return float(valor)
+    # Un valor con letras (ej. código interno "0084PT0000") no es un precio
+    if re.search(r'[a-zA-Z]', re.sub(r'(?i)ars|pesos', '', str(valor))): return 0.0
     s = re.sub(r'[^\d,.]', '', str(valor).strip())
     if not s: return 0.0
     if ',' in s and '.' in s:
