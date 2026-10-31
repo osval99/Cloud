@@ -1,0 +1,9 @@
+credentials.json
+token.json
+*.xlsx
+*.xls
+*.ods
+*.csv
+Procesados/
+DUDAS/
+__pycache__/

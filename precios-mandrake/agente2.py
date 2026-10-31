@@ -47,7 +47,18 @@ def limpiar_precio_ar(valor):
 
 def limpiar_isbn(valor):
     if pd.isna(valor): return ""
-    return re.sub(r'[^\d]', '', str(valor).split('.')[0].strip())
+    return re.sub(r'[^\dX]', '', str(valor).split('.')[0].strip().upper())
+
+def isbn_valido(s):
+    """Verifica el dígito de control. ISBN-13: pesos 1/3, módulo 10.
+    ISBN-10: pesos 10..1, módulo 11 (el último puede ser X = 10)."""
+    if len(s) == 13 and s.isdigit():
+        return sum(int(d) * (1 if i % 2 == 0 else 3) for i, d in enumerate(s)) % 10 == 0
+    if len(s) == 10 and s[:9].isdigit() and (s[9].isdigit() or s[9] == 'X'):
+        total = sum(int(d) * (10 - i) for i, d in enumerate(s[:9]))
+        total += 10 if s[9] == 'X' else int(s[9])
+        return total % 11 == 0
+    return False
 
 def col_clean(col):
     return re.sub(r'[.\s_\-/]', '', str(col).lower())
@@ -77,6 +88,29 @@ NUEVO_KEYS  = ['nuevo', 'actual', 'vigente', 'final', 'junio', 'julio', 'agosto'
 NO_PRECIO   = ['novedad', 'cambio', 'anio', 'año', 'edicion', 'stock', 'familia',
                'seccion', 'coleccion', 'genero', 'autor', 'titulo', 'descripcion',
                'editorial', 'estado', 'observ', 'nota', 'descuento', 'bonif']
+
+def es_isbn13(v):
+    s = limpiar_isbn(v)
+    return len(s) == 13 and s[:3] in ('978', '979') and isbn_valido(s)
+
+def buscar_columna_isbn13(df, col_actual, n=30):
+    """Si col_actual tiene mayormente ISBN de 10 dígitos, devuelve el índice de
+    otra columna con >= 60% de ISBN-13 (978/979). Si no, None."""
+    muestra = df.iloc[:n, col_actual].dropna()
+    if len(muestra) == 0:
+        return None
+    hits13 = sum(1 for v in muestra if len(limpiar_isbn(v)) == 13)
+    if hits13 / len(muestra) >= 0.5:
+        return None
+    mejor, mejor_score = None, 0.6
+    for i in range(len(df.columns)):
+        if i == col_actual: continue
+        m = df.iloc[:n, i].dropna()
+        if len(m) == 0: continue
+        score = sum(1 for v in m if es_isbn13(v)) / len(m)
+        if score >= mejor_score:
+            mejor, mejor_score = i, score
+    return mejor
 
 def detectar_columnas_estricto(df):
     """
@@ -135,6 +169,12 @@ def detectar_columnas_estricto(df):
         col_isbn, nombre_isbn = mejor_isbn
     else:
         col_isbn, nombre_isbn = candidatos_isbn[0]
+
+    # El ISBN casi siempre es de 13 dígitos: si la columna elegida es mayormente
+    # de 10 y hay otra columna con ISBN-13 (978/979), usar esa.
+    col13 = buscar_columna_isbn13(df, col_isbn)
+    if col13 is not None:
+        col_isbn, nombre_isbn = col13, df.columns[col13]
 
     # Verificar que la columna ISBN realmente contenga ISBNs
     muestra_isbn = df.iloc[:20, col_isbn].dropna()
@@ -324,6 +364,7 @@ def procesar(modo_auto=False, archivos_especificos=None):
     config = cargar_config()
     lista_final = []
     lista_dudas = []
+    lista_invalidos = []
     ts = datetime.now().strftime('%H%M')
 
     for archivo in archivos:
@@ -374,6 +415,12 @@ def procesar(modo_auto=False, archivos_especificos=None):
                     col_precio = cfg.get("precio")
                     col_titulo = cfg.get("titulo")
                     print(f"     [CONFIG] Usando configuracion guardada: ISBN={col_isbn}, Precio={col_precio}, Titulo={col_titulo}")
+                    col13 = buscar_columna_isbn13(df, col_isbn)
+                    if col13 is not None:
+                        print(f"     [ISBN-13] Se usa la col [{col13}] (ISBN de 13) en vez de la [{col_isbn}] (ISBN de 10)")
+                        col_isbn = col13
+                        config[config_key] = {**cfg, "isbn": col13}
+                        guardar_config(config)
                 else:
                     # ── Detección estricta ──
                     col_isbn, col_precio, col_titulo, motivo_fallo = detectar_columnas_estricto(df)
@@ -427,10 +474,20 @@ def procesar(modo_auto=False, archivos_especificos=None):
                 df_res['Precio'] = df.iloc[:, col_precio].apply(limpiar_precio_ar)
                 df_res['Origen'] = f"{os.path.basename(archivo)} | {hoja}"
 
-                df_valido = df_res[
-                    df_res['ISBN'].str.len().isin([10, 13]) &
-                    (df_res['Precio'] > 0)
-                ].copy()
+                es_valido = df_res['ISBN'].apply(isbn_valido)
+                # Un "precio" de 9 o más cifras es en realidad un código/ISBN mal tomado
+                precio_ok = (df_res['Precio'] > 0) & (df_res['Precio'] < 1e8)
+                invalidos = df_res[df_res['ISBN'].str.len().isin([10, 13]) & ~es_valido & precio_ok]
+                if len(invalidos):
+                    print(f"     [AVISO] {len(invalidos)} ISBN con digito verificador incorrecto (a ISBN_INVALIDOS)")
+                    lista_invalidos.append(invalidos)
+                if ((df_res['Precio'] >= 1e8) & es_valido).sum() > len(df_res) * 0.5:
+                    lista_dudas.append({'Archivo': archivo, 'Hoja': hoja,
+                        'Motivo': 'La columna de precio parece contener codigos/ISBN, no precios',
+                        'Columnas': ''})
+                    print(f"     [DUDA] La columna de precio parece contener codigos — enviado a DUDAS")
+                    continue
+                df_valido = df_res[es_valido & precio_ok].copy()
 
                 if df_valido.empty:
                     print(f"     [AVISO] Sin registros validos.")
@@ -464,6 +521,11 @@ def procesar(modo_auto=False, archivos_especificos=None):
         print(f"[OK] Resultado principal : {nombre_out}  ({len(resultado_max)} registros)")
     else:
         print("[AVISO] No se genero resultado.")
+
+    if lista_invalidos:
+        nombre_inv = f"ISBN_INVALIDOS_{ts}.xlsx"
+        pd.concat(lista_invalidos, ignore_index=True).to_excel(nombre_inv, index=False)
+        print(f"[DUDA] ISBN invalidos    : {nombre_inv}  ({sum(len(x) for x in lista_invalidos)} filas)")
 
     if lista_dudas:
         nombre_dudas = f"DUDAS_{ts}.xlsx"
