@@ -43,7 +43,15 @@ def limpiar_precio_ar(valor):
     elif ',' in s: s = s.replace(',', '.')
     elif '.' in s:
         partes = s.split('.')
-        if len(partes[-1]) == 3: s = s.replace('.', '')
+        if len(partes) > 2:
+            # Múltiples puntos: todos son separador de miles excepto
+            # el último si tiene 1-2 dígitos (decimal)
+            if len(partes[-1]) <= 2:
+                s = ''.join(partes[:-1]) + '.' + partes[-1]
+            else:
+                s = ''.join(partes)
+        elif len(partes[-1]) == 3:
+            s = s.replace('.', '')
     try: return float(s)
     except: return 0.0
 
@@ -90,6 +98,28 @@ NUEVO_KEYS  = ['nuevo', 'actual', 'vigente', 'final', 'junio', 'julio', 'agosto'
 NO_PRECIO   = ['novedad', 'cambio', 'anio', 'año', 'edicion', 'stock', 'familia',
                'seccion', 'coleccion', 'genero', 'autor', 'titulo', 'descripcion',
                'editorial', 'estado', 'observ', 'nota', 'descuento', 'bonif']
+
+def isbn10_a_13(s):
+    """Convierte un ISBN-10 a ISBN-13 (prefijo 978 + nuevo dígito de control)."""
+    base = '978' + s[:9]
+    suma = sum(int(d) * (1 if i % 2 == 0 else 3) for i, d in enumerate(base))
+    return base + str((10 - suma % 10) % 10)
+
+def normalizar_isbn(s):
+    """Devuelve (isbn13, motivo). isbn13 vacío si no es un ISBN usable.
+    Solo valen ISBN-13 con prefijo 978/979 y dígito correcto; los ISBN-10
+    válidos se pasan a 13."""
+    if len(s) == 13:
+        if s[:3] not in ('978', '979'):
+            return '', 'Codigo de 13 digitos sin prefijo 978/979 (no es ISBN)'
+        if not isbn_valido(s):
+            return '', 'ISBN-13 con digito verificador incorrecto'
+        return s, ''
+    if len(s) == 10:
+        if not isbn_valido(s):
+            return '', 'ISBN-10 con digito verificador incorrecto'
+        return isbn10_a_13(s), ''
+    return '', 'Largo distinto de 10 o 13'
 
 def es_isbn13(v):
     s = limpiar_isbn(v)
@@ -253,6 +283,61 @@ def detectar_columnas_estricto(df):
 #  DETECCION DE FILA HEADER
 # ─────────────────────────────────────────────
 
+# ─────────────────────────────────────────────
+#  FILTRO DE FILAS OCULTAS
+# ─────────────────────────────────────────────
+
+def obtener_filas_ocultas(archivo, hoja):
+    ext = os.path.splitext(archivo)[1].lower()
+    ocultas = set()
+
+    if ext == '.xlsx' or ext == '.xlsm':
+        try:
+            import openpyxl
+            wb = openpyxl.load_workbook(archivo, read_only=False, data_only=True)
+            if hoja not in wb.sheetnames:
+                wb.close()
+                return ocultas
+            ws = wb[hoja]
+            for row_idx in range(1, ws.max_row + 1):
+                if ws.row_dimensions[row_idx].hidden:
+                    ocultas.add(row_idx)
+            wb.close()
+        except Exception as e:
+            print(f"     [AVISO] No se pudieron detectar filas ocultas: {e}")
+
+    elif ext == '.xls':
+        try:
+            import xlrd
+            wb = xlrd.open_workbook(archivo, formatting_info=True)
+            sh = wb.sheet_by_name(hoja)
+            for row_idx in range(sh.nrows):
+                ri = sh.rowinfo_map.get(row_idx)
+                if ri and ri.hidden:
+                    ocultas.add(row_idx + 1)
+            del wb
+        except Exception as e:
+            print(f"     [AVISO] No se pudieron detectar filas ocultas (.xls): {e}")
+
+    return ocultas
+
+def filtrar_filas_ocultas(df, archivo, hoja, fila_header):
+    ocultas = obtener_filas_ocultas(archivo, hoja)
+    if not ocultas:
+        return df, 0
+
+    filas_a_eliminar = []
+    for idx in df.index:
+        fila_excel = fila_header + 2 + idx
+        if fila_excel in ocultas:
+            filas_a_eliminar.append(idx)
+
+    if filas_a_eliminar:
+        df_filtrado = df.drop(filas_a_eliminar)
+        return df_filtrado, len(filas_a_eliminar)
+
+    return df, 0
+
 def detectar_fila_header(df_raw):
     KEYWORDS = ['isbn', 'pvp', 'precio', 'ean', 'codigo', 'titulo', 'title', 'autor']
     mejor, mejor_hits = 0, 0
@@ -346,6 +431,79 @@ def consultar_usuario(archivo, hoja, df, motivo_fallo):
 #  PROCESO PRINCIPAL
 # ─────────────────────────────────────────────
 
+# ─────────────────────────────────────────────
+#  MAPEOS YA RESUELTOS PARA LISTAS PARECIDAS
+#  La config se guarda por nombre exacto de archivo, que cambia cada mes.
+#  Si no hay entrada exacta, se busca una de un archivo parecido (mismas
+#  palabras sin fechas/meses/remitente) y misma hoja, y se valida el contenido.
+# ─────────────────────────────────────────────
+
+PALABRAS_VACIAS = {
+    'fwd', 'fw', 'vr', 'rv', 're', 'no', 'subject', 'de', 'del', 'la', 'el', 'los', 'las', 'y',
+    'a', 'al', 'en', 'partir', 'para', 'por', 'con', 'lista', 'listas', 'precio', 'precios',
+    'cambio', 'cambios', 'nueva', 'nuevo', 'actualizacion', 'aumento', 'aumentos', 'xlsx',
+    'xls', 'ods', 'csv', 'copia', 'importante', 'informacion',
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre',
+    'setiembre', 'octubre', 'noviembre', 'diciembre', 'ene', 'feb', 'mar', 'abr', 'may',
+    'jun', 'jul', 'ago', 'sep', 'sept', 'oct', 'nov', 'dic'}
+
+def _arreglar_texto(t):
+    try:
+        return t.encode('latin-1').decode('utf-8')   # "ActualizaciÃ³n" -> "Actualización"
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return t
+
+def firma_archivo(nombre):
+    """Palabras que identifican la lista, sin fecha, remitente, meses ni números."""
+    import unicodedata
+    n = _arreglar_texto(os.path.basename(nombre))
+    n = re.sub(r'^\d{4}-\d{2}-\d{2}(T\d{2}-\d{2})?\s*', '', n)   # fecha inicial
+    n = re.sub(r'\[[^\]]*\]', ' ', n)                              # [remitente]
+    n = unicodedata.normalize('NFKD', n).encode('ascii', 'ignore').decode().lower()
+    palabras = re.findall(r'[a-z]+', n)
+    return {p for p in palabras if p not in PALABRAS_VACIAS and len(p) > 1}
+
+def columnas_validas(df, col_isbn, col_precio):
+    """Comprueba que un mapeo viejo sirva para este archivo."""
+    n = len(df.columns)
+    if col_isbn is None or col_precio is None or col_isbn >= n or col_precio >= n:
+        return False
+    m_isbn = df.iloc[:30, col_isbn].dropna()
+    m_prec = df.iloc[:30, col_precio].dropna()
+    if len(m_isbn) == 0 or len(m_prec) == 0:
+        return False
+    ok_isbn = sum(1 for v in m_isbn if normalizar_isbn(limpiar_isbn(v))[0]) / len(m_isbn)
+    ok_prec = sum(1 for v in m_prec if 100 < limpiar_precio_ar(v) < 1e8) / len(m_prec)
+    return ok_isbn >= 0.5 and ok_prec >= 0.5
+
+def buscar_config_parecida(config, archivo, hoja, df):
+    """Devuelve (clave, cfg) de un archivo parecido con la misma hoja, o (None, None)."""
+    firma = firma_archivo(archivo)
+    if not firma:
+        return None, None
+    candidatos = []
+    for clave, cfg in config.items():
+        if '|' not in clave:
+            continue
+        nombre, h = clave.rsplit('|', 1)
+        if h.strip().lower() != str(hoja).strip().lower():
+            continue
+        f2 = firma_archivo(nombre)
+        if not f2:
+            continue
+        parecido = len(firma & f2) / len(firma | f2)
+        if parecido >= 0.4:
+            candidatos.append((parecido, clave, cfg))
+    # Más parecido primero; a igual parecido, el más reciente
+    for parecido, clave, cfg in sorted(candidatos, key=lambda x: (x[0], x[1]), reverse=True):
+        if cfg.get('descartado'):
+            if parecido >= 0.6:
+                return clave, cfg
+            continue
+        if columnas_validas(df, cfg.get('isbn'), cfg.get('precio')):
+            return clave, cfg
+    return None, None
+
 def procesar(modo_auto=False, archivos_especificos=None):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(script_dir)
@@ -403,11 +561,23 @@ def procesar(modo_auto=False, archivos_especificos=None):
                 df = pd.read_excel(archivo, sheet_name=hoja, skiprows=fila_h)
                 df = df.dropna(how='all')
 
+                # ── Filtrar filas ocultas ──
+                df, n_ocultas = filtrar_filas_ocultas(df, archivo, hoja, fila_h)
+                if n_ocultas > 0:
+                    df = df.reset_index(drop=True)
+                    print(f"     [FILTRO] {n_ocultas} filas ocultas eliminadas, quedan {len(df)} visibles")
+
                 if len(df) < 3:
                     print(f"     [VACIO] Muy pocas filas ({len(df)}), omitida.")
                     continue
 
                 # ── Verificar si ya tiene configuración guardada ──
+                if config_key not in config:
+                    clave_par, cfg_par = buscar_config_parecida(config, archivo, hoja, df)
+                    if cfg_par is not None:
+                        print(f"     [CONFIG] Lista ya resuelta antes: {clave_par[:90]}")
+                        config[config_key] = dict(cfg_par)
+                        guardar_config(config)
                 if config_key in config:
                     cfg = config[config_key]
                     if cfg.get("descartado"):
@@ -476,20 +646,24 @@ def procesar(modo_auto=False, archivos_especificos=None):
                 df_res['Precio'] = df.iloc[:, col_precio].apply(limpiar_precio_ar)
                 df_res['Origen'] = f"{os.path.basename(archivo)} | {hoja}"
 
-                es_valido = df_res['ISBN'].apply(isbn_valido)
+                norm = df_res['ISBN'].apply(normalizar_isbn)
+                df_res['ISBN original'] = df_res['ISBN']
+                df_res['ISBN'] = norm.str[0]
+                df_res['Motivo'] = norm.str[1]
+                es_valido = df_res['ISBN'] != ''
                 # Un "precio" de 9 o más cifras es en realidad un código/ISBN mal tomado
                 precio_ok = (df_res['Precio'] > 0) & (df_res['Precio'] < 1e8)
-                invalidos = df_res[df_res['ISBN'].str.len().isin([10, 13]) & ~es_valido & precio_ok]
+                invalidos = df_res[df_res['ISBN original'].str.len().isin([10, 13]) & ~es_valido & precio_ok]
                 if len(invalidos):
-                    print(f"     [AVISO] {len(invalidos)} ISBN con digito verificador incorrecto (a ISBN_INVALIDOS)")
-                    lista_invalidos.append(invalidos)
+                    print(f"     [AVISO] {len(invalidos)} codigos que no son ISBN validos (a ISBN_INVALIDOS)")
+                    lista_invalidos.append(invalidos[['ISBN original', 'Titulo', 'Precio', 'Origen', 'Motivo']])
                 if ((df_res['Precio'] >= 1e8) & es_valido).sum() > len(df_res) * 0.5:
                     lista_dudas.append({'Archivo': archivo, 'Hoja': hoja,
                         'Motivo': 'La columna de precio parece contener codigos/ISBN, no precios',
                         'Columnas': ''})
                     print(f"     [DUDA] La columna de precio parece contener codigos — enviado a DUDAS")
                     continue
-                df_valido = df_res[es_valido & precio_ok].copy()
+                df_valido = df_res[es_valido & precio_ok][['ISBN', 'Titulo', 'Precio', 'Origen']].copy()
 
                 if df_valido.empty:
                     print(f"     [AVISO] Sin registros validos.")
@@ -514,12 +688,17 @@ def procesar(modo_auto=False, archivos_especificos=None):
         resultado = pd.concat(lista_final, ignore_index=True).drop_duplicates()
 
         # Tomar siempre el precio más alto para cada ISBN
+        # Orden de columnas: ISBN, Precio, Titulo, Origen
         resultado_max = (resultado.sort_values('Precio', ascending=False)
                          .drop_duplicates(subset='ISBN')
-                         [['ISBN', 'Titulo', 'Precio', 'Origen']])
+                         [['ISBN', 'Precio', 'Titulo', 'Origen']])
 
-        nombre_out = f"RESULTADO_FINAL_{ts}.xlsx"
-        resultado_max.to_excel(nombre_out, index=False)
+        # Precio como entero (sin decimales)
+        resultado_max['Precio'] = resultado_max['Precio'].round().astype(int)
+
+        # Separador COMA (requerido para cargar en Fierro), UTF-8
+        nombre_out = f"RESULTADO_FINAL_{ts}.csv"
+        resultado_max.to_csv(nombre_out, index=False, sep=',', encoding='utf-8-sig')
         print(f"[OK] Resultado principal : {nombre_out}  ({len(resultado_max)} registros)")
     else:
         print("[AVISO] No se genero resultado.")
