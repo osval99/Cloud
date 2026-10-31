@@ -440,5 +440,35 @@
     "isbn": 2,
     "precio": 3,
     "titulo": null
+  },
+  "2026-10-31 [link] Abrazandocuentos_Titulos distribucion 1 Noviembre 2026.xlsx|lista actual": {
+    "isbn": 1,
+    "precio": 4,
+    "titulo": 2
+  },
+  "2026-10-31 [link] ComaCuatro_noviembre-2026.xlsx|Lista de precios": {
+    "isbn": 0,
+    "precio": 4,
+    "titulo": null
+  },
+  "2026-10-31 [link] DelNaranjo_noviembre-2026.xlsx|Hoja1": {
+    "isbn": 0,
+    "precio": 5,
+    "titulo": null
+  },
+  "2026-10-31 [link] FCE-lista-precios-noviembre-2026.xlsx|NOVIEMBRE": {
+    "isbn": 0,
+    "precio": 5,
+    "titulo": 1
+  },
+  "2026-10-31 [link] Manolito_noviembre-2026.xlsx|Hoja 1": {
+    "isbn": 0,
+    "precio": 4,
+    "titulo": null
+  },
+  "2026-10-31 [link] sigmar_lista-de-precios-noviembre-2026.xlsx|Por Título": {
+    "isbn": 2,
+    "precio": 5,
+    "titulo": null
   }
 }

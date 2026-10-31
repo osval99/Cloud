@@ -35,27 +35,32 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
   y hay otra con ISBN-13 (978/979), se usa la de 13 (también sobre la config guardada).
 - Se verifica el **dígito de control** (ISBN-13: pesos 1/3 mód. 10; ISBN-10: pesos 10..1 mód. 11, X=10).
   Los que no validan van a `ISBN_INVALIDOS_<hora>.xlsx`, no al resultado.
+- Un valor con letras (ej. código interno "0084PT0000") no se toma como precio.
 - Si la columna de "precio" tiene valores ≥ 100.000.000 (son códigos/ISBN), la hoja va a DUDAS.
 - `agente2_config.json` guarda el mapeo de columnas por `archivo|hoja`; si un mapeo está mal, corregirlo ahí.
 
-## Estado actual (31/10/2026) — tanda noviembre 2026
-Corrida en la PC Linux `/home/oficina1/Cloud/precios-mandrake/` (no en Windows), cuenta mandrake.dis@gmail.com.
-- 25 mails con adjuntos → 37 archivos bajados, movidos a `Procesados/`; los 25 mails quedaron con `Resuelto`.
-- **Resultado**: `RESULTADO_FINAL_1321.xlsx` (29.335 registros: 29.258 ISBN-13, 77 ISBN-10).
-- `ISBN_INVALIDOS_1321.xlsx`: 243 filas (113 ISBN distintos) con dígito verificador incorrecto — revisar.
-- `DUDAS_1321.xlsx`: 18 casos (hojas) sin procesar:
-  - Galerna / Aurelia Rivera (2 mails), Cien Flores, Herramienta (jaossanna): error "out-of-bounds" en varias hojas.
-  - AKAL (facturacion): precio ambiguo "Precio $ Actual" vs "PVP PESOS FINAL".
-  - Sigmar (una hoja) y Herramienta (2 hojas): no se encontró columna ISBN.
+## Listas que llegan por link
+El script solo baja adjuntos. Las listas por link se bajan resolviendo el link de seguimiento del mail
+(curl -L; los de Brevo/sendibm redirigen con JavaScript: buscar la URL dentro del HTML).
+Google Sheets: `.../export?format=xlsx`; Drive: `drive.google.com/uc?export=download&id=<ID>`.
+Se guardan en `Procesados/` como `2026-10-31 [link] <nombre>.xlsx` y se procesan junto con los adjuntos.
+
+## Estado actual (31/10/2026) — tanda noviembre 2026: COMPLETA
+Corrida en la PC Linux `/home/oficina1/Cloud/precios-mandrake/`, cuenta mandrake.dis@gmail.com.
+Los 34 mails de la etiqueta quedaron con `Resuelto` (no queda ninguno pendiente).
+- 37 adjuntos (25 mails) + 6 listas por link (Coma Cuatro, FCE, Sigmar, Abrazandocuentos, Del Naranjo, Manolito).
+- **Resultado**: `RESULTADO_FINAL_1350.xlsx` (36.655 registros: 36.572 ISBN-13, 83 ISBN-10).
 - `PRECIOS_CUERPO_MAIL.xlsx`: 9789875589964 Amancio Williams (UNL) $40.000; 9786313001170 Tarot para colorear $30.000.
-- `Descartados/`: resultados de las corridas 1315 y 1318, con errores (Cuenco: precio = ISBN; Sigmar "Por Título":
-  precio = código interno; Continente: ISBN-10). No usar.
-- Se procesó también "Promos nov-dic.xlsx" (Librum): son promos, no lista — revisar si debe quedar en el resultado.
+- `ISBN_INVALIDOS_1350.xlsx`: 294 filas con dígito verificador incorrecto — revisar.
+- `DUDAS_1350.xlsx`: 19 hojas sin procesar:
+  - Galerna / Aurelia Rivera (2 mails), Cien Flores, Herramienta (jaossanna): error "out-of-bounds".
+  - AKAL (facturacion): precio ambiguo "Precio $ Actual" vs "PVP PESOS FINAL".
+  - Sigmar "Por colección" (x2, mismo contenido que "Por Título") y Herramienta (2 hojas): sin columna ISBN.
+- Revisar: 7 precios < $1.000 de El Ateneo (ISBN 978958…, Colombia) — ¿moneda distinta?
+- Se procesó "Promos nov-dic.xlsx" (Librum) y la promo Manolito ($29.900): son promos — revisar si van.
+- `Descartados/`: corridas anteriores con errores. No usar.
 
 ### Pendientes
-- Listas por link (no las baja el script, no se intentó): Coma Cuatro (Drive, El Cuenco de Plata), Abrazandocuentos,
-  Del Naranjo, Manolito (Mega Atlas, promo $29.900), FCE (lista PVP), Sigmar (botón en el mail).
-- Promos, no lista: Librum (promos nov-dic), FCE (10 títulos a $18.000).
 - Conflictos manuales viejos: 9789871374915 (Carbono, $23.000 vs $37.500); 9789872349417 (Herramienta, 2 títulos).
 - El pipeline no mueve RESULTADO_FINAL/DUDAS a `Procesados/` (quedan en la carpeta).
 
@@ -64,6 +69,7 @@ Corrida en la PC Linux `/home/oficina1/Cloud/precios-mandrake/` (no en Windows),
 2. Mostrar ISBN pre-detectado cuando el precio es ambiguo
 3. Arreglar el error "single positional indexer is out-of-bounds" (Galerna, Cien Flores, Herramienta)
 4. Reconocer encabezados con tilde ("Código Barras")
+5. Bajar automáticamente las listas por link desde `actualizar_precios.py`
 
 ## Google Apps Script (bajar adjuntos de Gmail)
 - **Cuenta**: actualizar.mandrakelibros@gmail.com
