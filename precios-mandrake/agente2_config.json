@@ -479,5 +479,50 @@
   },
   "2026-10-28T15-22 [facturacion.arg@akal.com] AKAL - AUMENTO DE PRECIOS NOVIEMBRE 2026 - AKAL - LISTA DE PRECIOS - NOVIEMBRE 2026.xlsx|Hoja1": {
     "descartado": true
+  },
+  "2026-10-31T08-00 [info@carbonolibros.com.ar] Ventas octubre + Cambio de precios + Novedades noviembre - 0Carbono Precios NOV 2026.xlsx|AGOSTO": {
+    "isbn": 2,
+    "precio": 3,
+    "titulo": null
+  },
+  "2026-10-31T10-38 [gonzalo@navarroeditoriales.com.ar] CAMBIO de PRECIOS  KONEMANN # NOVIEMBRE 2026 - LISTA DE PRECIOS - KONEMANN # NOVIEMBRE 2026.xls|panel": {
+    "isbn": 1,
+    "precio": 4,
+    "titulo": null
+  },
+  "2026-11-02T14-59 [Mariana.Labati@penguinrandomhouse.com] Cambios de PVP - 1-11-26 - cuerpo del mail.xlsx|Sheet1": {
+    "isbn": 0,
+    "precio": 3,
+    "titulo": 1
+  },
+  "2026-11-02T15-31 [ciraololibros@gmail.com] 11.2026 - AUMENTOS DE PRECIOS III - CIRAOLO LIBROS - 11.26 - CAMBIO DE PRECIOS DIST. HERRAMIENTA - CIRAOLO LIBROS.xlsx|CAMBIO DE PRECIOS": {
+    "isbn": 2,
+    "precio": 3,
+    "titulo": null
+  },
+  "2026-11-02T15-31 [ciraololibros@gmail.com] 11.2026 - AUMENTOS DE PRECIOS III - CIRAOLO LIBROS - 2026.11 - AUMENTOS DE PRECIOS - CIRAOLO LIBROS.xlsx|CAMBIO DE PRECIOS": {
+    "isbn": 2,
+    "precio": 3,
+    "titulo": null
+  },
+  "2026-11-02T15-31 [ciraololibros@gmail.com] 11.2026 - AUMENTOS DE PRECIOS III - CIRAOLO LIBROS - 2026.11 - AUMENTOS DE PRECIOS - CIRAOLO LIBROS.xlsx|11.26 GRUPO PLANETA solo firme": {
+    "isbn": 2,
+    "precio": 3,
+    "titulo": null
+  },
+  "2026-11-02T15-56 [mandrakelibros@gmail.com] Fwd IMPORTANTE Catálogo - Nuevo Listado PVP (NOV 2026) - Hule AR - Catálogo Completo PVP NOV 2026.xlsx|TITULOS HULE 11-2026": {
+    "isbn": 1,
+    "precio": 11,
+    "titulo": 4
+  },
+  "2026-11-02T15-53 [mandrakelibros@gmail.com] Fwd CAMBIO DE PRECIOS BIKINI NINJA Y ZINDO&GAFURI - CAMBIO DE PRECIOS BIKINI Y ZINDO 01-11-26.xls|Hoja1": {
+    "isbn": 2,
+    "precio": 10,
+    "titulo": 1
+  },
+  "2026-11-02 [link] Periferica catalogo.xls|Hoja1": {
+    "isbn": 0,
+    "precio": 10,
+    "titulo": null
   }
 }

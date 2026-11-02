@@ -59,7 +59,30 @@ OUTLET, USADO…). Al terminar, "Guardar errores..." como `errores_<nombre de la
   `quitar N arriba|abajo K` + `registrar "tanda|isbn|titulo|precio|nuevo|var|motivo"` → `aplicar N` (~4-7 min por
   tanda de 4.500). Criterio de raro: precio nuevo < $1.000 o > $500.000, variación > +500% o < −70%.
   Para quitar una fila hay que **seleccionarla con clic** (queda naranja): Ctrl+Home/End mueve el foco, no la selección.
-  Ajustar `DIR` y el nombre de las tandas cada mes. Si Fierro pide "Reconectar", el script responde Sí.
+  La carpeta de las tandas se pone en `/tmp/fierro_tandas/dir.txt` (los archivos se llaman `<carpeta>_tandaN.csv`,
+  `errores_<carpeta>_tandaN.csv`, `RAROS_<carpeta>.csv`). Si Fierro pide "Reconectar", el script responde Sí.
+- **Filas con variación 0%: quitarlas antes de Aplicar** (pedido del usuario 2/11/2026), **todas juntas**:
+  con la grilla ordenada por Variación, seleccionar con clic la primera fila en 0 y correr `quitar_ceros_bloque.py quitar`:
+  extiende la selección con **Shift+↓** mientras siga en 0 (lee con OCR, tesseract + Pillow), verifica que no haya
+  ninguna fila ≠ 0 seleccionada y aprieta Quitar una sola vez. Registra en `QUITADOS_variacion_0_<carpeta>.csv`.
+  `quitar_ceros_fierro.py prueba` lee la vista; `quitar_ceros_fierro.py quitar` lo hace fila por fila (lento, ~10/min).
+
+## Flujo completo (hacerlo solo, sin preguntar)
+1. `herramientas/revisar.py`: lista los mails con `PRECIOS PARA ACTUALIZAR`. `bajar_nuevos.py` baja los adjuntos a
+   `Nuevos_<fecha>/` y marca **repetidos** por md5 contra `Procesados/` y entre sí. Abrir links si la lista viene por link.
+   Tablas en el cuerpo del mail (ej. PRH "Cambios de PVP"): `prh_cuerpo.py` las pasa a xlsx (solo PVP Nuevo).
+2. Etiquetas: los nuevos llevan **`En Proceso`**; los repetidos (misma lista ya cargada) pasan directo a `Resuelto`
+   (`etiquetar.py`, adaptar las reglas a cada tanda). Mails que no son listas (ej. Navarro "GRUPAL… DEVOLUCION"): no tocar.
+3. `agente2.py --auto <archivos>` → `RESULTADO_FINAL_<hora>.csv`.
+4. `herramientas/solo_cambios.py RESULTADO.csv precios_<mes>_<letra>`: deja solo ISBN nuevos o con precio distinto
+   a lo ya cargado en `~/fierro-claude/importaciones/precios_*/` (los proveedores repiten listas acumuladas).
+5. Cargar en Fierro (`cargar_fierro.py`), quitar raros y ceros, aplicar.
+6. `herramientas/resolver.py`: pasa a `Resuelto` **solo** los mails con `PRECIOS PARA ACTUALIZAR` **y** `En Proceso`.
+   ⚠ `En Proceso` también se usa en mails de transferencias y devoluciones: nunca etiquetar por `En Proceso` solo
+   (pasó el 2/11/2026 y hubo que revertir).
+- **Periférica**: no manda mail. Una vez por mes bajar `https://www.laperiferica.com.ar/catalogo.xls` (catálogo
+  completo; la página es https://www.laperiferica.com.ar/catalogos/, botón "Catálogo"). Columnas ISBN (0) y PVP $ (10).
+- La Coop avisa aumentos de Buena Cosecha sin lista adjunta: revisar www.lacoop.com.ar.
 
 ## Validación de ISBN (agente2.py)
 - El ISBN es casi siempre de **13 dígitos** (rara vez 10). Si la columna elegida tiene mayormente ISBN-10
@@ -91,6 +114,13 @@ Los 34 mails de la etiqueta quedaron con `Resuelto`.
 - `RAROS_precios_nov2026.csv` (misma carpeta): 7 casos NO aplicados para revisar a mano (subas > 500%, un ISBN
   múltiple en Fierro y "Atlas descrito por el cielo" 9789685679091, quitado por error: cargar $9.000 si corresponde).
 - `Descartados/`: corridas anteriores con errores. No usar.
+
+### Segunda tanda (2/11/2026)
+16 mails. Repetidos → Resuelto: Herramienta, UNL, AKAL. Nuevos: Hule, Bikini Ninja/Zindo, La Coop, Ciraolo III,
+PRH Labati (cuerpo del mail), Konemann, Carbono. `RESULTADO_FINAL_1804.csv` 9.793 filas, 8.836 ya cargadas igual →
+`precios_nov2026_b/` 957 filas: **161 aplicados**, 0 raros (variaciones −34% a +15%). Mails → Resuelto.
+**Periférica** (`RESULTADO_FINAL_1816.csv`, 606) → `precios_nov2026_c/` 604 filas: 343 vinculadas en Fierro,
+322 en 0% quitadas → **21 aplicados** (−51% a +38%, 0 raros). Próxima Periférica: diciembre 2026.
 
 ### Pendientes
 - Conflictos manuales viejos: 9789871374915 (Carbono, $23.000 vs $37.500); 9789872349417 (Herramienta, 2 títulos).
