@@ -47,8 +47,19 @@ Sistema automatizado de actualización de precios para Librería Mandrake.
 Ventas > Listas de precios > LISTA MOSTRADOR > Precios > ícono "Importar precios desde un archivo".
 Formato del archivo: **Personalizado** (CSV), separador coma, fin de línea Windows, empezar desde línea 2.
 Vincular por **ISBN**, columna 1. **No** tildar "Actualizar el precio si se encuentra más de un libro con el
-mismo código" (hay libros duplicados, ej. gemelos outlet). Ir paso a paso con el usuario; Aceptar/Aplicar solo
-con su visto bueno. Tandas en `~/fierro-claude/importaciones/precios_nov2026/`.
+mismo código" (hay libros duplicados, ej. gemelos outlet). Filtro: **Carácter = LINEA** (no tocar OFERTA!,
+OUTLET, USADO…). Al terminar, "Guardar errores..." como `errores_<nombre de la tanda>.csv` en la misma carpeta.
+- **Desde la próxima vez el usuario quiere que se haga todo solo**: separar los casos raros (bajas fuertes,
+  códigos dudosos) en un archivo aparte **sin procesar** para que los vea, y seguir con el resto de las tandas.
+- En la pantalla :5 la tecla **Alt puede trabarse** (keycode 64): antes de escribir, verificar que no haya teclas
+  apretadas; si las letras abren menús, parar y soltarla (pasó el 2/11/2026 y cerró los diálogos).
+- Precio en la **columna 2** (el asistente propone 1). Moneda Pesos. Tandas en `~/fierro-claude/importaciones/precios_<mes>/`.
+- **Script `cargar_fierro.py`** (PC Linux, hace todo lo anterior): `preparar N` → `finish N` → `errores N` (guarda
+  errores y deja capturas de los extremos de la grilla en `/tmp/fierro_tandas/tN_9.png` y `tN_10.png`) → revisar →
+  `quitar N arriba|abajo K` + `registrar "tanda|isbn|titulo|precio|nuevo|var|motivo"` → `aplicar N` (~4-7 min por
+  tanda de 4.500). Criterio de raro: precio nuevo < $1.000 o > $500.000, variación > +500% o < −70%.
+  Para quitar una fila hay que **seleccionarla con clic** (queda naranja): Ctrl+Home/End mueve el foco, no la selección.
+  Ajustar `DIR` y el nombre de las tandas cada mes. Si Fierro pide "Reconectar", el script responde Sí.
 
 ## Validación de ISBN (agente2.py)
 - El ISBN es casi siempre de **13 dígitos** (rara vez 10). Si la columna elegida tiene mayormente ISBN-10
@@ -75,7 +86,10 @@ Los 34 mails de la etiqueta quedaron con `Resuelto`.
 - **Resultado**: `RESULTADO_FINAL_1418.csv` (36.538) + `PRECIOS_CUERPO_MAIL.xlsx` (2) → 8 tandas en
   `~/fierro-claude/importaciones/precios_nov2026/` (36.532 precios; sin los 7 descatalogados de El Ateneo).
 - `ISBN_INVALIDOS_1418.xlsx`: 430 filas que no son ISBN válidos. `DUDAS_1418.xlsx`: 17, todas hojas vacías o repetidas.
-- **Carga en Fierro: pendiente**, se hace paso a paso con el usuario.
+- **Carga en Fierro: HECHA (2/11/2026)**, LISTA MOSTRADOR, filtro LINEA: **29.047 precios aplicados**;
+  7.691 filas no vinculadas (libro inexistente o no LINEA) en `errores_precios_nov2026_tandaN.csv` (falta el de la tanda 1).
+- `RAROS_precios_nov2026.csv` (misma carpeta): 7 casos NO aplicados para revisar a mano (subas > 500%, un ISBN
+  múltiple en Fierro y "Atlas descrito por el cielo" 9789685679091, quitado por error: cargar $9.000 si corresponde).
 - `Descartados/`: corridas anteriores con errores. No usar.
 
 ### Pendientes
