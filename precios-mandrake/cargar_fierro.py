@@ -1,15 +1,13 @@
-# Ayudante para importar tandas de precios en Fierro (pantalla virtual :5 de la PC Linux).
-# Usa ~/fierro-claude/cu.py. Las tandas van en DIR con nombre precios_<mes>_tandaN.csv:
-# ajustar DIR y los nombres de archivo cada mes.
-# Uso: python3 cargar_fierro.py <fase> <n_tanda>
+# Ayudante para importar tandas de precios en Fierro (pantalla :5).
+# Uso: python3 ft.py <fase> <n_tanda>
 #   preparar  -> abre el asistente, configura CSV/ISBN/precio/filtro LINEA y hace Finish
 #   errores   -> guarda errores_precios_nov2026_tandaN.csv y cierra resultados
 #   aplicar   -> Aplicar y espera a que la grilla quede vacía
 import ctypes, hashlib, os, subprocess, sys, time
 
 CU = ['python3', '-I', '/home/oficina1/fierro-claude/cu.py']
-DIR = '/home/oficina1/fierro-claude/importaciones/precios_nov2026'
-os.makedirs('/tmp/fierro_tandas', exist_ok=True)
+DIR = open('/tmp/fierro_tandas/dir.txt').read().strip() if os.path.exists('/tmp/fierro_tandas/dir.txt') else '/home/oficina1/fierro-claude/importaciones/precios_nov2026_b'
+NOM = os.path.basename(DIR)
 REF0 = 'ed3e162887d49ddfbb9e58d17401c5aa'   # captura de "Cambios de precio: 0"
 
 def cu(*a):
@@ -63,7 +61,7 @@ def preparar(n):
     if abiertas: raise SystemExit(f'Hay diálogos abiertos: {abiertas}')
     cu('click', 778, 46); esperar('Importación de precios'); time.sleep(1.5)
     cu('click', 1020, 171); time.sleep(1.2); cu('click', 1010, 232); time.sleep(1.2)   # Personalizado
-    cu('click', 620, 132); escribir(f'{DIR}/precios_nov2026_tanda{n}.csv'); cu('key', 'Tab'); time.sleep(1)
+    cu('click', 620, 132); escribir(f'{DIR}/{NOM}_tanda{n}.csv'); cu('key', 'Tab'); time.sleep(1)
     cu('click', 673, 172); time.sleep(0.8)                                             # línea 2
     cu('click', 1113, 172); time.sleep(2.5)                                            # vista previa
     cu('shot', f'/tmp/fierro_tandas/t{n}_1.png', 193, 102, 1146, 588)
@@ -91,7 +89,7 @@ def errores(n):
     wid = esperar('Guardar archivo de errores'); time.sleep(1.5)
     cu('fit', wid); time.sleep(1.5)
     cu('click', 700, 27); time.sleep(0.5)
-    ruta = f'{DIR}/errores_precios_nov2026_tanda{n}.csv'
+    ruta = f'{DIR}/errores_{NOM}_tanda{n}.csv'
     escribir(ruta)
     cu('shot', f'/tmp/fierro_tandas/t{n}_7.png', 0, 0, 1340, 60)
     if 'Guardar archivo de errores' not in ventanas().values():
@@ -136,7 +134,7 @@ def quitar(n, extremo, cuantas):
 def registrar(fila):
     """fila = 'tanda|isbn|titulo|precio fierro|precio nuevo|variacion|motivo'"""
     import csv
-    f = f'{DIR}/RAROS_precios_nov2026.csv'
+    f = f'{DIR}/RAROS_{NOM}.csv'
     with open(f, 'a', newline='', encoding='utf-8-sig') as fh:
         csv.writer(fh).writerow(fila.split('|'))
     print(open(f, encoding='utf-8-sig').read())
