@@ -82,7 +82,9 @@ OUTLET, USADO…). Al terminar, "Guardar errores..." como `errores_<nombre de la
    (pasó el 2/11/2026 y hubo que revertir).
 - **Periférica**: no manda mail. Una vez por mes bajar `https://www.laperiferica.com.ar/catalogo.xls` (catálogo
   completo; la página es https://www.laperiferica.com.ar/catalogos/, botón "Catálogo"). Columnas ISBN (0) y PVP $ (10).
-- La Coop avisa aumentos de Buena Cosecha sin lista adjunta: revisar www.lacoop.com.ar.
+- La Coop siempre adjunta "Lista de precios…"/"Aumentos…" (el "SN …" son solo novedades). En nov. 2026 anunció
+  aumentos de Buena Cosecha **sin adjuntar la lista**; la web www.lacoop.com.ar está deshabilitada. Se dejó un
+  borrador de respuesta pidiéndola (2/11/2026, cuenta mandrake.dis). **Pendiente**: cargarla cuando llegue.
 
 ## Validación de ISBN (agente2.py)
 - El ISBN es casi siempre de **13 dígitos** (rara vez 10). Si la columna elegida tiene mayormente ISBN-10
