@@ -27,6 +27,7 @@ Al terminar cada tarea, antes del commit final:
 |---------|-------------|
 | `datos-tecnicos-libros/` | Buscar datos técnicos de libros a partir de ISBNs (en definición) |
 | `escaner-fierro/` | PWA que escanea códigos de barra y los pasa a Fierro |
+| `fierro/` | Manejo del ERP Fierro por pantalla (`cu.py`, reposición, facturas de compra); se usa desde `~/fierro-claude/` (enlaces) |
 | `finanzas/` | Estrategia de manejo de liquidez en pesos |
 | `mantenimiento-pc/` | Datos y tareas de mantenimiento de la PC (Windows 10) |
 | `precios-mandrake/` | Scripts Python para actualizar precios de Librería Mandrake vía Gmail |
