@@ -4,20 +4,21 @@ import sys, time, csv
 sys.path.insert(0, '/home/oficina1/Cloud/precios-mandrake')
 import cargar_fierro as ft, quitar_ceros_fierro as ceros
 
-def main(ejecutar):
+def main(ejecutar, arriba=False):
+    ADEL, ATR = ('shift+Up', 'shift+Down') if arriba else ('shift+Down', 'shift+Up')
     sel = []
     f = ceros.leer()
     vistos = {r['isbn'] for r in f if r['sel']}
     sel += [r for r in f if r['sel']]
     for _ in range(400):
-        ft.cu('key', 'shift+Down'); time.sleep(0.7)
+        ft.cu('key', ADEL); time.sleep(0.7)
         f = ceros.leer()
         nuevos = [r for r in f if r['sel'] and r['isbn'] not in vistos]
         if not nuevos:
             break                                   # fin de la grilla
-        r = nuevos[-1]
+        r = nuevos[0] if arriba else nuevos[-1]
         if r['var'] != 0.0:
-            ft.cu('key', 'shift+Up'); time.sleep(0.7)   # esa fila no es 0: sacarla de la selección
+            ft.cu('key', ATR); time.sleep(0.7)   # esa fila no es 0: sacarla de la selección
             break
         vistos.add(r['isbn']); sel.append(r)
     f = ceros.leer(); ceros.mostrar(f)
@@ -32,4 +33,4 @@ def main(ejecutar):
         ft.cu('shot', '/tmp/fierro_tandas/bloque_despues.png', 0, 490, 1340, 690)
 
 if __name__ == '__main__':
-    main(len(sys.argv) > 1 and sys.argv[1] == 'quitar')
+    main('quitar' in sys.argv, 'arriba' in sys.argv)
