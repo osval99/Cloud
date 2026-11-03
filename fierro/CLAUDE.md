@@ -123,6 +123,26 @@ Método acordado con el usuario (comando `/reposicion`):
 - 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
   → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
 
+## Libros duplicados (mismo ISBN y mismo carácter)
+
+- Fierro no tiene reporte de duplicados. El usuario **no quiere exportaciones que queden fuera del sistema**: se usa
+  Catálogo > Reportes > Reportes de catálogo > Exportaciones de stock > **"Exportación de catálogo con IDs de libros"**
+  con salida **"Programa externo"**: deja `/tmp/tmpXXXX.csv` (ISBN, Código de Barras, Código interno, Carácter,
+  Id. del libro, Fecha de alta…), se lee en memoria y se borra enseguida. Después Fierro pide un programa para abrirlo:
+  Aceptar → `fit` del selector → Cancelar.
+- Todo el catálogo o todo LINEA de una vez: el servidor corta ("Imposible conectar con el servidor"). El filtro usa
+  **un solo panel** (no combina carácter + fecha) y el Código es igualdad exacta (sin comodines). Método: panel
+  "General extendido" por **año de alta** (~12.000 fichas/año, ~10 min c/u), juntar todo y agrupar por ISBN-13 + carácter.
+- **3/11/2026: paquete "Libros duplicados 03-11-2026"** (tipo Modificar datos, sucursal DISTRIBUIDORA, porque :5
+  estaba ocupada): 255.085 fichas revisadas → 3.479 ISBN+carácter duplicados, **7.328 fichas** (cant. 1 c/u).
+  Por carácter: LINEA 2.983 ISBN, OFERTA! 194, USADO 185, OUTLET 114, outlet 1/2 2, REVISTA SALDO 1. Hay colecciones
+  que comparten ISBN (Hades ×78, serie Gredos, 9788494339608 con 16 títulos de animales): no son errores de carga.
+- Armado: CSV temporal → Ventana Activa > Importar documento desde CSV (Personalizado, desde línea 2, Código col. 1
+  con radio **"Código interno"**, Cantidad col. 4) y borrarlo. Las fichas con código interno compartido o sin código
+  fallan ("Más de un libro tiene el código…"): se agregan a mano escribiendo el ISBN en Código + Enter, eligiendo la
+  ficha en "Selección de libros" (el detalle muestra el código interno). Aunque se seleccionen varias, Aceptar agrega
+  **solo una**: repetir por ficha. Al guardar, Fierro exige elegir un tipo de paquete.
+
 ## Segunda pantalla
 
 Si otra sesión está usando `:5`, se puede abrir `:6` (Xephyr con título "Fierro (Claude 2)" + `/opt/bin/fierro`) y
