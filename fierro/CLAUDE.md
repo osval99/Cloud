@@ -87,6 +87,25 @@ Método acordado con el usuario (comando `/reposicion`):
   después **clic en el segundo tramo** y escribir `8 1 4 6 2`. Verificar con captura (Home y End).
 - Cargada así: FG B 00016-00081462 (24/08/2026, $877.939,70, 46 ej.) el 3/11/2026.
 
+## Facturas de venta de saldos (Planeta) a clientes de RC
+
+- RC = Ricardo (rcquilmes@hotmail.com), maneja el depósito de Quilmes. Manda remitos (`Remito_Saldos_<cliente>_<fecha>.xlsx`).
+- Se factura en la **sucursal DISTRIBUIDORA**: Ventas > Facturas de venta > ícono **FG** "Crear una nueva factura general".
+  Cliente (Macao = `Maca`, Cuevas Cristian Matías; Patres = `16455` PATRES MARCELO DARIO, no Odiseya). Al elegir
+  cliente Fierro pone "FC Electrónica": **cambiar Punto de Venta a "14 - Fac. Distribución Mayorista"**. Tipo
+  "Factura con leyenda", vencimiento +30 días, Importe total = ejemplares × $3.000 (precio en
+  `~/Documentos/Saldos PLaneta 05102026/Balance cobranza saldos…xlsx`), IVA 0. Descripción (modelo FG 14-00000428):
+  `N libros de saldo según detalle adjunto.` / `Precio unitario: $3000.-` / `Total: $X.-` / `Pago con e-cheq: 30/60/90 días`.
+  Formas de Pago → ícono "Ingresar pago de cuenta corriente" → Aceptar. Aceptar → Sí (límite de crédito) → emite en ARCA.
+  No imprimir ticket ni factura.
+- Acentos: si `type` dice "Carácter sin tecla", correr `DISPLAY=:6 setxkbmap es` y reescribir.
+- **PDF**: Fierro lo manda por mail al cliente si tiene correo (queda en Enviados de mandrake.dis). Si no, en la lista
+  seleccionar la factura e ícono "Imprimir factura de venta": abre el visor con `/tmp/tmpXXXX.pdf`; copiarlo.
+- Guardar en `~/Documentos/Saldos PLaneta 05102026/` como `<Cliente> Factura Saldos <número>.pdf` y mandarlos a RC.
+- 3/11/2026: FG 14-00000448 Macao 457 ej $1.371.000 y FG 14-00000449 Patres 462 ej $1.386.000 (remitos del 18/10/2026).
+- ARCA avisa que desde el **01/12/2026** rechaza comprobantes sin "Condición frente al IVA del receptor": revisar
+  que Fierro lo envíe antes de esa fecha.
+
 ## Segunda pantalla
 
 Si otra sesión está usando `:5`, se puede abrir `:6` (Xephyr con título "Fierro (Claude 2)" + `/opt/bin/fierro`) y
