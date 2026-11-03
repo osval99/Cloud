@@ -524,5 +524,15 @@
     "isbn": 0,
     "precio": 10,
     "titulo": null
+  },
+  "2026-11-02T19-31 [delasallej@hotmail.com.ar] RV LISTAS LOSADA Y AIQUE NOVIEMBRE 2026 - LISTA DE PRECIOS AIQUE DIDÁCTICA NOVIEMBRE 2026_.xlsx|LISTA DE PRECIOS EDUCACION ": {
+    "isbn": 1,
+    "precio": 3,
+    "titulo": 2
+  },
+  "2026-11-02T19-31 [delasallej@hotmail.com.ar] RV LISTAS LOSADA Y AIQUE NOVIEMBRE 2026 - LISTA LOSADA NOVIEMBRE 2026.xlsx|LISTA NOVIEMBRE 2026": {
+    "isbn": 3,
+    "precio": 4,
+    "titulo": null
   }
 }

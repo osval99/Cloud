@@ -61,6 +61,9 @@ OUTLET, USADO…). Al terminar, "Guardar errores..." como `errores_<nombre de la
   Para quitar una fila hay que **seleccionarla con clic** (queda naranja): Ctrl+Home/End mueve el foco, no la selección.
   La carpeta de las tandas se pone en `/tmp/fierro_tandas/dir.txt` (los archivos se llaman `<carpeta>_tandaN.csv`,
   `errores_<carpeta>_tandaN.csv`, `RAROS_<carpeta>.csv`). Si Fierro pide "Reconectar", el script responde Sí.
+- **Forma recomendada**: después de `errores N`, correr `quitar_ceros_todos.py` (grilla ordenada por Variación
+  descendente: ceros entre positivos y negativos). Repite bloques con Shift+↑ desde el último 0 hasta que no quede
+  ninguno junto a los negativos (la selección a veces se corta, por eso repite). Después `aplicar N`.
 - **Filas con variación 0%: quitarlas antes de Aplicar** (pedido del usuario 2/11/2026), **todas juntas**:
   con la grilla ordenada por Variación, seleccionar con clic la primera fila en 0 y correr `quitar_ceros_bloque.py quitar`:
   extiende la selección con **Shift+↓** mientras siga en 0 (lee con OCR, tesseract + Pillow), verifica que no haya
@@ -123,6 +126,10 @@ PRH Labati (cuerpo del mail), Konemann, Carbono. `RESULTADO_FINAL_1804.csv` 9.79
 `precios_nov2026_b/` 957 filas: **161 aplicados**, 0 raros (variaciones −34% a +15%). Mails → Resuelto.
 **Periférica** (`RESULTADO_FINAL_1816.csv`, 606) → `precios_nov2026_c/` 604 filas: 343 vinculadas en Fierro,
 322 en 0% quitadas → **21 aplicados** (−51% a +38%, 0 raros). Próxima Periférica: diciembre 2026.
+**Losada y Aique** (mail de la Salle, 2/11/2026; `RESULTADO_FINAL_2346.csv`, 1.744) → `precios_nov2026_d/`:
+1.605 vinculadas, 357 en 0% quitadas → **1.248 aplicados** (−6% a +175%, 0 raros). Mail → Resuelto.
+- **El usuario NO quiere que se le pida autorización ni confirmación**: da la orden y espera solo el aviso final.
+  `Cloud/.claude/settings.local.json` (no versionado) tiene todos los permisos habilitados para eso.
 
 ### Pendientes
 - Conflictos manuales viejos: 9789871374915 (Carbono, $23.000 vs $37.500); 9789872349417 (Herramienta, 2 títulos).
