@@ -61,14 +61,18 @@ OUTLET, USADO…). Al terminar, "Guardar errores..." como `errores_<nombre de la
   Para quitar una fila hay que **seleccionarla con clic** (queda naranja): Ctrl+Home/End mueve el foco, no la selección.
   La carpeta de las tandas se pone en `/tmp/fierro_tandas/dir.txt` (los archivos se llaman `<carpeta>_tandaN.csv`,
   `errores_<carpeta>_tandaN.csv`, `RAROS_<carpeta>.csv`). Si Fierro pide "Reconectar", el script responde Sí.
-- **Forma recomendada**: después de `errores N`, correr `quitar_ceros_todos.py` (grilla ordenada por Variación
-  descendente: ceros entre positivos y negativos). Repite bloques con Shift+↑ desde el último 0 hasta que no quede
-  ninguno junto a los negativos (la selección a veces se corta, por eso repite). Después `aplicar N`.
-- **Filas con variación 0%: quitarlas antes de Aplicar** (pedido del usuario 2/11/2026), **todas juntas**:
-  con la grilla ordenada por Variación, seleccionar con clic la primera fila en 0 y correr `quitar_ceros_bloque.py quitar`:
-  extiende la selección con **Shift+↓** mientras siga en 0 (lee con OCR, tesseract + Pillow), verifica que no haya
-  ninguna fila ≠ 0 seleccionada y aprieta Quitar una sola vez. Registra en `QUITADOS_variacion_0_<carpeta>.csv`.
-  `quitar_ceros_fierro.py prueba` lee la vista; `quitar_ceros_fierro.py quitar` lo hace fila por fila (lento, ~10/min).
+- **Filas con variación 0%: quitarlas todas juntas antes de Aplicar** (pedido del usuario 2/11/2026).
+  Grilla ordenada por Variación **descendente** (si `tN_9` muestra ▲, hacer clic en el encabezado Variación (960,539)).
+  `quitar_ceros_rapido.py quitar`: clic en la primera fila en 0, rueda del mouse hasta abajo, **Shift+clic** en la
+  última fila en 0, verifica ambos bordes con OCR (tesseract + Pillow) y aprieta Quitar una vez. Si la rueda no llegó
+  al final quita solo un tramo: **repetirlo hasta que diga "No encontré ceros"** (con 3.900 filas, 2 pasadas).
+  ⚠ En esta grilla **Ctrl+A no selecciona nada** y **Ctrl+End/Ctrl+Home borran la selección**: moverse con la rueda.
+  `quitar_ceros_fierro.py prueba` lee la vista actual (ISBN, precios, variación, si está seleccionada).
+  En listas completas de una editorial (ej. Planeta) casi todo da 0%: de 3.871 quedaron 16.
+- **Precios de $2.500 en Planeta = costo de saldo, NO precio de venta**: no aplicarlos (quitar de la grilla) y listarlos en
+  `SALDOS_<editorial>_<mes>_costo_2500.xlsx` (ISBN, código, título, autor, sello, costo, precio Fierro sin cambiar).
+- Libros con varios ISBN en Fierro (celda `['978…', '978…']`) pueden recibir dos precios en tandas distintas:
+  queda el de la última tanda. Planeta nov. 2026 dejó el más alto en los 4 casos (regla: tomar el más alto).
 
 ## Flujo completo (hacerlo solo, sin preguntar)
 1. `herramientas/revisar.py`: lista los mails con `PRECIOS PARA ACTUALIZAR`. `bajar_nuevos.py` baja los adjuntos a
@@ -128,6 +132,12 @@ PRH Labati (cuerpo del mail), Konemann, Carbono. `RESULTADO_FINAL_1804.csv` 9.79
 322 en 0% quitadas → **21 aplicados** (−51% a +38%, 0 raros). Próxima Periférica: diciembre 2026.
 **Losada y Aique** (mail de la Salle, 2/11/2026; `RESULTADO_FINAL_2346.csv`, 1.744) → `precios_nov2026_d/`:
 1.605 vinculadas, 357 en 0% quitadas → **1.248 aplicados** (−6% a +175%, 0 raros). Mail → Resuelto.
+**Planeta catálogo general nov. 2026** (subido por el usuario 3/11/2026 para comparar con Fierro; cargado completo con
+`herramientas/tandas.py`, sin filtrar por lo ya cargado) → `planeta_nov2026/` 2 tandas: 6.857 vinculadas, casi todas
+iguales; **32 aplicados** (20 + 12). No aplicados: 5 saldos a $2.500 (MILEI y 4 más) → `RAROS_planeta_nov2026.csv` y
+`SALDOS_Planeta_nov2026_costo_2500.xlsx` (7 títulos; 2 no están en Fierro como LINEA).
+- Fierro (Claude) en `:5` puede cerrarse: `~/fierro-claude/iniciar_fierro.sh`, pedirle al usuario el login (lo único que
+  se le pide), luego `iniciar_fierro.sh ajustar` y Ventas > Listas de precios > LISTA MOSTRADOR > Precios.
 - **El usuario NO quiere que se le pida autorización ni confirmación**: da la orden y espera solo el aviso final.
   `Cloud/.claude/settings.local.json` (no versionado) tiene todos los permisos habilitados para eso.
 
