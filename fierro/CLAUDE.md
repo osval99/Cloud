@@ -40,6 +40,7 @@ Consejos:
 - En menús y listas el teclado (Down/Right/Escape) es más fiable que el mouse.
 - En listas, la búsqueda por escritura se corta en espacios y acentos: escribir solo la primera palabra y bajar con Down.
 - Campos de fecha (máscara dd/mm/aaaa): clic, `key Home`, escribir los 8 dígitos.
+- En Facturas de compra, el filtro **Número** busca en todas las sucursales (el combo Sucursal no lo limita).
 - El botón Buscar a veces no responde: usar **Ctrl+B** (Ventana Activa > Herramientas de búsqueda > Búsqueda).
 - Diálogos más grandes que la pantalla (ej. "Guardar como..."): `fit <id>` y escribir la ruta completa en "Nombre".
 
@@ -105,6 +106,22 @@ Método acordado con el usuario (comando `/reposicion`):
 - 3/11/2026: FG 14-00000448 Macao 457 ej $1.371.000 y FG 14-00000449 Patres 462 ej $1.386.000 (remitos del 18/10/2026).
 - ARCA avisa que desde el **01/12/2026** rechaza comprobantes sin "Condición frente al IVA del receptor": revisar
   que Fierro lo envíe antes de esa fecha.
+
+## Comprobantes de Planeta (comfiar) en DISTRIBUIDORA
+
+- Llegan a mandrake.dis desde acliente.eplaneta@la.comfiar.com.ar ("Aviso de emisión del comprobante (Factura B / Nota de
+  Crédito B) Nro …"). Link "DESCARGAR" → `planeta_comprobantes.py` (IMAP, lo corre el usuario) o, con el conector de
+  Gmail, sacar los links y bajar con `bajar_pdf()` del mismo script. PDFs y `resumen.csv` en `facturas/planeta/`.
+- **Solo cuenta 1006187** (DISTRIBUIDORA; la 1005707 es la otra). El punto de venta (0028/0032) no indica la cuenta:
+  mirar "001006187 SHCOLER…" en cada PDF.
+- Facturas → Facturas de compra > ícono **FG**: proveedor `PLA` + Tab, letra B, tipo "Factura general", número (de a un
+  dígito, como en PRH), fecha, vencimiento del PDF, importe total, IVA 0, descripción `dd/mm/aaaa vto Nej. importe`
+  (modelo FG B 00028-00045711). Aceptar → Sí.
+- Notas de crédito → Compras > Créditos > ícono **NG** "nota de crédito general (sin ejemplares)": `PLA` + Tab, motivo
+  "Faltantes" ("NOTA DE CRÉDITO POR FALTANTE") o "Error de facturación", letra B, número, fecha, importe, descripción
+  `dd/mm/aaaa Nej. importe FB 0028-xxxxx`. Aceptar → Sí.
+- 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
+  → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
 
 ## Segunda pantalla
 

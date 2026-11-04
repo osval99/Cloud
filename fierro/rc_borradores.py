@@ -28,8 +28,10 @@ RC = Path.home() / "Documentos" / "RC"
 
 # Id de Gmail del mail de RC (hex, como lo muestra la API) → factura y texto de la respuesta.
 RESPUESTAS = [
-    ("1a18d6e11e6b1653", RC / "Massarino 30-10-26.pdf",
-     "Ricardo:\nTe adjunto la factura FG 14-00000447 de Sergio Marcelo Massarino por $ 514.800,00.\nAbrazo\nOsvaldo\n"),
+    ("1a1a6de064cb80ed", RC / "Mattia 04-11-26.pdf",
+     "Ricardo:\nTe adjunto la factura FG 14-00000450 de Mariano Alejandro Mattia por $ 1.151.040,00.\nAbrazo\nOsvaldo\n"),
+    ("1a1a6e74b921e5ac", RC / "Ludditas 04-11-26.pdf",
+     "Ricardo:\nTe adjunto la factura FG 14-00000451 de Cristian Arenas (Ludditas) por $ 1.357.320,00.\nAbrazo\nOsvaldo\n"),
 ]
 
 
