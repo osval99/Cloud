@@ -89,9 +89,15 @@ OUTLET, USADO…). Al terminar, "Guardar errores..." como `errores_<nombre de la
    (pasó el 2/11/2026 y hubo que revertir).
 - **Periférica**: no manda mail. Una vez por mes bajar `https://www.laperiferica.com.ar/catalogo.xls` (catálogo
   completo; la página es https://www.laperiferica.com.ar/catalogos/, botón "Catálogo"). Columnas ISBN (0) y PVP $ (10).
-- La Coop siempre adjunta "Lista de precios…"/"Aumentos…" (el "SN …" son solo novedades). En nov. 2026 anunció
-  aumentos de Buena Cosecha **sin adjuntar la lista**; la web www.lacoop.com.ar está deshabilitada. Se dejó un
-  borrador de respuesta pidiéndola (2/11/2026, cuenta mandrake.dis). **Pendiente**: cargarla cuando llegue.
+- La Coop siempre adjunta "Lista de precios…"/"Aumentos…" (el "SN …" son solo novedades); la web www.lacoop.com.ar
+  está deshabilitada. Columnas: EAN13 (4), Precio 1 (5), Desde (fecha de vigencia).
+  Nov. 2026: la lista llegó el 4/11 como respuesta al pedido ("Lista de precios - La Coop - Noviembre 2026.xlsx",
+  vigente desde 10/11). 873 ISBN válidos, **97 en Fierro como LINEA y los 97 ya tenían el mismo precio: no se aplicó nada**
+  (se canceló la grilla). Los 10 de Buena Cosecha no están en Fierro como LINEA. Hilo → Resuelto.
+- Si toda la grilla queda en 0%, **Cancelar** (1280,646) descarta los cambios y cierra la pestaña de la lista;
+  reabrirla con LISTA MOSTRADOR seleccionada > Precios (1272,266).
+- `herramientas/bajar_msg.py <id> <carpeta>` baja los adjuntos de un mail puntual (ej. respuestas sin etiqueta);
+  `resolver_hilo.py <thread>` pasa un hilo entero a Resuelto.
 
 ## Validación de ISBN (agente2.py)
 - El ISBN es casi siempre de **13 dígitos** (rara vez 10). Si la columna elegida tiene mayormente ISBN-10
