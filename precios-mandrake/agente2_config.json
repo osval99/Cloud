@@ -534,5 +534,10 @@
     "isbn": 3,
     "precio": 4,
     "titulo": null
+  },
+  "2026-11-03 [subido] Lista de precios noviembre.xlsx|Hoja2": {
+    "isbn": 1,
+    "precio": 6,
+    "titulo": 2
   }
 }

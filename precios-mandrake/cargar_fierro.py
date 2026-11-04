@@ -8,7 +8,7 @@ import ctypes, hashlib, os, subprocess, sys, time
 CU = ['python3', '-I', '/home/oficina1/fierro-claude/cu.py']
 DIR = open('/tmp/fierro_tandas/dir.txt').read().strip() if os.path.exists('/tmp/fierro_tandas/dir.txt') else '/home/oficina1/fierro-claude/importaciones/precios_nov2026_b'
 NOM = os.path.basename(DIR)
-REF0 = 'ed3e162887d49ddfbb9e58d17401c5aa'   # captura de "Cambios de precio: 0"
+REF0 = {'ed3e162887d49ddfbb9e58d17401c5aa', '2253920deca89b2708dbc6cec99b95b9'}   # grilla vacía
 
 def cu(*a):
     subprocess.run(CU + [str(x) for x in a], check=True, capture_output=True)
@@ -112,7 +112,7 @@ def aplicar(n):
     while time.time() - t0 < 900:
         time.sleep(10); reconectar_si_hace_falta()
         cu('shot', '/tmp/fierro_tandas/cambios.png', 0, 495, 200, 518)
-        if hashlib.md5(open('/tmp/fierro_tandas/cambios.png', 'rb').read()).hexdigest() == REF0:
+        if hashlib.md5(open('/tmp/fierro_tandas/cambios.png', 'rb').read()).hexdigest() in REF0:
             print(f'  aplicado en {int(time.time()-t0)}s'); return
     raise SystemExit('La grilla no quedó vacía en 15 min')
 
