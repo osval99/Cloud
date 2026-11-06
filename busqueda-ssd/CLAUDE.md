@@ -9,6 +9,14 @@ al menor precio en mercadolibre.com.ar. Resultado: top 10 en el chat + planilla 
 - En el chat, los 10 más baratos: modelo, capacidad, precio, vendedor, envío gratis sí/no, link.
 - Planilla Excel con todos los resultados y links.
 - Navegar como una persona (navegador integrado de la app). No inventar datos.
+- **Compras internacionales: sumar el impuesto de importación** (pedido del usuario, 05/11/2026).
+  El precio publicado no lo incluye ("Este precio no incluye impuestos. Conocerás el total
+  antes de pagar"). Régimen courier hasta USD 400 por envío: se paga IVA 21%; si se supera,
+  además derechos de importación. Máximo 5 envíos internacionales por año.
+  `armar_planilla.py` suma 21% (`IVA_INTERNACIONAL`) y **ordena por el total estimado**.
+  En el chat mostrar precio publicado y total estimado, y aclarar que es estimación.
+  Revisar alícuota y franquicia si cambia la normativa (fuentes: calcusite.com.ar,
+  wise.com/ar; no verificado en ARCA). Los precios locales ya incluyen impuestos.
 
 ## Cómo repetirla
 1. **Navegador integrado**: Mercado Libre muestra el listado solo con la sesión iniciada.
@@ -37,7 +45,8 @@ al menor precio en mercadolibre.com.ar. Resultado: top 10 en el chat + planilla 
    directamente. Fila: `[id, titulo, precio, vendedor, envio_gratis, internacional, marca,
    modelo, capacidad_gb, motivo_descarte]`.
 6. **Verificar el top 10** entrando a cada publicación (`extraer_detalle.js`): condición,
-   vendedor (en compras internacionales el listado no lo muestra) y precio.
+   vendedor (en compras internacionales el listado no lo muestra) y precio. Verificar
+   unos 15 candidatos: al sumar el IVA, publicaciones locales algo más caras entran al top.
    Ojo: en publicaciones de catálogo (`/p/MLA...`) puede haber dos ofertas ("En cuotas" y
    "Mejor precio") de vendedores distintos; el precio del listado es el de "Mejor precio".
 7. **Planilla**: `python armar_planilla.py datos/<fecha>_resultados.json datos/<fecha>_verificados.json planillas/ssd_mercadolibre_<fecha>.xlsx`
@@ -47,12 +56,14 @@ al menor precio en mercadolibre.com.ar. Resultado: top 10 en el chat + planilla 
 
 ## Última búsqueda: 05/11/2026
 - 543 publicaciones leídas, 284 válidas.
-- Los más baratos son SanDisk Portable 500 GB desde $239.346, casi todos compra
-  internacional (EE.UU.). El más barato local fue un WD_Black 500 GB a $259.000 (01TEC),
-  y después Kingston Dual Portable 512 GB a $355.510 (tienda oficial SGI).
+- Con IVA incluido, el más barato es el WD_Black 500 GB local a $259.000 (01TEC). Le siguen
+  SanDisk Portable 500 GB internacionales: $239.346 publicado, unos $289.609 con IVA. Después
+  vienen Kingston Dual Portable 512 GB locales: SGI $355.510, HARDIT $376.023 y
+  NOVA INFORMATICA $381.192.
 - Lo más barato de Samsung fue un T7 1 TB a $488.437; de Crucial, un X9 a $478.002
   (ambos internacionales).
-- Copia de la planilla en `C:\Users\osval\Documents\SSD Mercado Libre\`.
+- Copia de la planilla en `C:\Users\osval\Documents\SSD Mercado Libre\`
+  (`..._con_IVA.xlsx` es la vigente; la otra quedó sin IVA porque estaba abierta en Excel).
 
 ## Pendientes / ideas
-- Si el usuario quiere, separar en el chat las opciones locales de las internacionales.
+- Ver si el total exacto con impuestos se puede leer sin llegar al checkout (no se probó).
