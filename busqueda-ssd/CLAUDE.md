@@ -47,6 +47,13 @@ al menor precio en mercadolibre.com.ar. Resultado: top 10 en el chat + planilla 
 6. **Verificar el top 10** entrando a cada publicación (`extraer_detalle.js`): condición,
    vendedor (en compras internacionales el listado no lo muestra) y precio. Verificar
    unos 15 candidatos: al sumar el IVA, publicaciones locales algo más caras entran al top.
+   **Regla de marca** (pedido del usuario): `extraer_detalle.js` lee Marca/Modelo de la ficha
+   "Características del producto". Si la marca de la ficha no coincide con la del título,
+   se descarta: se anota en `verificados.json` → `"descartes_ficha": {"<id>": "motivo"}`
+   y la planilla la pasa a Descartados. Caso real: título "SanDisk 1 TB USB 3.2 Gen 2"
+   con ficha "Marca: Movespeed, Modelo: Vpro1TB" (MLA-2032018005). Si la ficha no trae
+   marca, no se descarta, pero se busca el número de parte en la descripción (lo devuelve el
+   extractor). Avisar también si el vendedor dice "No tiene suficientes ventas".
    Ojo: en publicaciones de catálogo (`/p/MLA...`) puede haber dos ofertas ("En cuotas" y
    "Mejor precio") de vendedores distintos; el precio del listado es el de "Mejor precio".
 7. **Planilla**: `python armar_planilla.py datos/<fecha>_resultados.json datos/<fecha>_verificados.json planillas/ssd_mercadolibre_<fecha>.xlsx`
@@ -56,7 +63,9 @@ al menor precio en mercadolibre.com.ar. Resultado: top 10 en el chat + planilla 
 
 ## Última búsqueda: 05/11/2026
 - 543 publicaciones leídas, 284 válidas.
-- Con IVA incluido, el más barato es el WD_Black 500 GB local a $259.000 (01TEC). Le siguen
+- Con IVA incluido, el más barato es el WD_BLACK D30 500 GB (WDBATL5000ABK-WESN, lectura
+  hasta 900 MB/s según tiendas de EE.UU.) local a $259.000. El vendedor, 01TEC, no tiene
+  reputación suficiente. Le siguen
   SanDisk Portable 500 GB internacionales: $239.346 publicado, unos $289.609 con IVA. Después
   vienen Kingston Dual Portable 512 GB locales: SGI $355.510, HARDIT $376.023 y
   NOVA INFORMATICA $381.192.

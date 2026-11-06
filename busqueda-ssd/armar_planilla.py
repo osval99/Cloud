@@ -68,6 +68,10 @@ def poner_link(celda, url):
 def main(ruta_datos, ruta_verif, salida):
     filas = leer_datos(ruta_datos)
     verif = json.load(open(ruta_verif, encoding="utf-8"))
+    # Descartes detectados entrando a la publicación (p. ej. la ficha dice otra marca
+    # que el título). Formato en verificados.json: "descartes_ficha": {"<id sin MLA>": "motivo"}
+    descartes = verif.get("descartes_ficha", {})
+    filas = [f[:9] + [descartes[str(f[0])]] if str(f[0]) in descartes else f for f in filas]
     wb = Workbook()
 
     # --- Top 10 verificado ---

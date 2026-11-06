@@ -7,7 +7,8 @@
     "Se descartaron precios irreales (menos de $150 por GB, p. ej. 'SSD 4 TB' a $130.000): suelen ser discos rígidos mal publicados o publicaciones dudosas.",
     "Top 10: precio, vendedor y condición confirmados entrando a cada publicación. En las hojas Válidos/Descartados el vendedor es el del listado (en compras internacionales el listado no lo muestra).",
     "'Compra internacional' = envío desde el exterior (EE.UU.). El precio publicado NO incluye impuestos (la publicación dice: 'Este precio no incluye impuestos. Conocerás el total antes de pagar'). Se suma IVA 21% como estimación (régimen courier, hasta USD 400 por envío; si se supera, hay además derechos de importación). Máximo 5 envíos internacionales por año. El ranking se ordena por el total estimado. Los precios locales ya incluyen impuestos.",
-    "Samsung T7/T9 y Crucial X9/X10: en esta búsqueda no aparecieron a precios que entren en el top 10 (ver hoja Válidos)."
+    "Samsung T7/T9 y Crucial X9/X10: en esta búsqueda no aparecieron a precios que entren en el top 10 (ver hoja Válidos).",
+    "Regla: entrando a cada publicación del top se compara la Marca de la ficha 'Características del producto' con la del título; si no coincide, se descarta."
   ],
   "top": [
     {
@@ -45,10 +46,10 @@
     },
     {
       "marca": "WD",
-      "modelo": "WD_Black (modelo no figura en el título)",
+      "modelo": "WD_BLACK D30 Game Drive (WDBATL5000ABK-WESN)",
       "capacidad": "500 GB",
       "precio": 259000,
-      "vendedor": "01TEC",
+      "vendedor": "01TEC (sin reputación suficiente)",
       "envio_gratis": true,
       "origen": "Local",
       "titulo": "Disco Duro SSD Externo Western Digital WD Black de 500 GB, para PC, PS4 y PS5",
@@ -120,5 +121,8 @@
       "titulo": "Disco Ssd Kingston Externo 512gb Dual Usb 3.2 A Usb C Mg",
       "link": "https://articulo.mercadolibre.com.ar/MLA-3101050358"
     }
-  ]
+  ],
+  "descartes_ficha": {
+    "2032018005": "Ficha dice otra marca: Marca Movespeed, Modelo Vpro1TB (título dice SanDisk)"
+  }
 }
