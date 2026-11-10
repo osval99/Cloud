@@ -45,6 +45,14 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 - **Sin medir todavía** qué % del catálogo tiene sinopsis. Probarlo con 100-200 ISBNs de una exportación de Fierro
   (se conecta con el proyecto `datos-tecnicos-libros/`). En la nube: openlibrary.org bloqueado y Google sin clave.
 
+## Antecedentes en otras librerías (búsqueda 10/11/2026)
+- **Casa del Libro (España)**: asistente "Truman" por WhatsApp y web; recomienda por título, autor, género o época.
+- **Librerías Gandhi (México)**: bot de WhatsApp (proveedor Indigitall) que busca por título, autor o ISBN y
+  muestra stock por sucursal. El proveedor dice +55.000 usuarios y +30% de ventas (no verificado).
+- Argentina: no se encontró que Yenny/El Ateneo o Cúspide tengan un bot así.
+- Proveedores con producto para librerías: ZENIA, Bibliolabtech, QuickReply.ai, Pabbly Chatflow.
+- Según Coderhouse, la IA de Meta para WhatsApp Business llegó a Argentina entre los primeros países de LATAM.
+
 ## Costos (no verificados en fuentes oficiales)
 - **Meta (artículo de SleekFlow del 22/10/2026, cita la tarifa oficial de Meta)**: desde el 1/10/2026 se cobra
   **cada** mensaje de servicio, lo mande una persona o una IA, sin descuento por volumen. **1.000 gratis por mes
