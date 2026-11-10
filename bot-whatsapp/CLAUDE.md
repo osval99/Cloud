@@ -22,6 +22,7 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 - **Horario de atención** (hora Argentina): lunes a viernes 09–20, sábados 10–14. Domingos y **feriados
   nacionales** cerrado. Fuera de ese horario el bot avisa que le responden cuando haya alguien.
   Feriados: tomarlos de una fuente automática (a definir) en vez de cargarlos a mano.
+- **Local**: Rioja 1869, Rosario. **Envíos**: solo comprando desde la página web (falta la URL).
 - **Precio que informa el bot**: LISTA MOSTRADOR.
 - **Asesoramiento**: Claude (API de Anthropic) + Google Books API (gratis; cuota a ver en la consola de Google),
   recomendando solo lo que esté en stock.
@@ -33,7 +34,7 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 - developers.facebook.com está bloqueado en la red de las sesiones en la nube: habilitarlo para leer la doc oficial.
 
 ## Pendiente (preguntas al usuario)
-- Dirección, medios de pago y si hacen envíos.
+- Medios de pago y URL de la página web.
 - Cuentas: el usuario tiene cuenta personal de Meta (no a nombre de La Mandrágora) y **no** tiene cuenta en la
   consola de Anthropic. Hay que crear un portfolio comercial (Meta Business) a nombre de La Mandrágora desde su
   cuenta, y una cuenta en console.anthropic.com con crédito. Guiarlo cuando se elija el proveedor.
