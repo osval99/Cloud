@@ -19,7 +19,7 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
   evaluar después "Fierro acceso a datos" (réplica SQL paga). Avisar al cliente que el stock es "al día de hoy".
 - **Servidor**: el usuario pidió comparar nube (10/11/2026). Opciones (precios de terceros, sin IVA, a confirmar):
   Google Cloud e2-micro gratis (1 GB RAM, regiones EE.UU.), DigitalOcean desde US$4-6/mes, Hetzner ~€4-5,5/mes,
-  Oracle Always Free (gratis, pero puede reclamar VMs inactivas). Recomendado: e2-micro gratis para empezar;
+  Oracle Always Free (gratis, pero puede reclamar VMs inactivas). **Elegido: Google Cloud e2-micro gratis** (confirmado 10/11/2026);
   si queda corto, VPS de US$6. En nube, la PC Linux sube el CSV diario de Fierro. Alternativa: PC Linux + túnel.
 - **Horario de atención** (hora Argentina): lunes a viernes 09–20, sábados 10–14. Domingos y **feriados
   nacionales** cerrado. Fuera de ese horario el bot avisa que le responden cuando haya alguien.
@@ -39,7 +39,6 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 
 ## Pendiente (preguntas al usuario)
 - ¿Stock solo de La Mandrágora?
-- ¿Servidor: Google Cloud e2-micro gratis?
 - Cuentas: el usuario tiene cuenta personal de Meta (no a nombre de La Mandrágora) y **no** tiene cuenta en la
   consola de Anthropic. Hay que crear un portfolio comercial (Meta Business) a nombre de La Mandrágora desde su
   cuenta, y una cuenta en console.anthropic.com con crédito. Guiarlo cuando se elija el proveedor.
