@@ -35,6 +35,11 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 - Enfoque propuesto: **catálogo enriquecido propio**. Por cada ISBN en stock se busca una vez (y luego solo los
   nuevos) sinopsis + categorías y se guardan. El bot busca por tema en ese catálogo (búsqueda semántica) y solo
   recomienda lo que hay. No consultar Google en vivo por cada mensaje (cuota y lentitud).
+- **Almacenamiento propuesto**: base **SQLite** (un solo archivo, ej. `catalogo.db`) en el servidor de Google Cloud
+  (disco gratis 30 GB). Tablas: libros (ISBN, título, autor, editorial, precio, stock, de Fierro) y fichas
+  (sinopsis, temas, fuente, fecha). Búsqueda por texto con FTS5; búsqueda semántica (embeddings) opcional después.
+  Respaldo: copia diaria a la PC Linux. **No** se versiona en GitHub (son datos). Estimación: ~300 MB para 50.000
+  títulos (sin medir; falta saber el tamaño del catálogo).
 - Fuentes: Google Books (principal; requiere **clave propia**: sin clave la cuota compartida da 0), Open Library,
   DILVE (España, ONIX, requiere usuario), webs de editoriales; conocimiento de Claude solo como apoyo y avisando.
 - **Sin medir todavía** qué % del catálogo tiene sinopsis. Probarlo con 100-200 ISBNs de una exportación de Fierro
