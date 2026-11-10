@@ -17,12 +17,16 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
   Fuera de horario: avisa que le van a responder cuando haya alguien.
 - **Precio/stock**: arrancar con **exportación CSV diaria de Fierro** (con `cu.py`, ver `fierro/CLAUDE.md`);
   evaluar después "Fierro acceso a datos" (réplica SQL paga). Avisar al cliente que el stock es "al día de hoy".
-- **Servidor recomendado**: la PC Linux del local (donde corre Fierro), con un túnel tipo Cloudflare Tunnel para
-  el webhook. Condición: PC prendida 24 h. Pendiente que el usuario lo confirme.
+- **Servidor**: el usuario pidió comparar nube (10/11/2026). Opciones (precios de terceros, sin IVA, a confirmar):
+  Google Cloud e2-micro gratis (1 GB RAM, regiones EE.UU.), DigitalOcean desde US$4-6/mes, Hetzner ~€4-5,5/mes,
+  Oracle Always Free (gratis, pero puede reclamar VMs inactivas). Recomendado: e2-micro gratis para empezar;
+  si queda corto, VPS de US$6. En nube, la PC Linux sube el CSV diario de Fierro. Alternativa: PC Linux + túnel.
 - **Horario de atención** (hora Argentina): lunes a viernes 09–20, sábados 10–14. Domingos y **feriados
   nacionales** cerrado. Fuera de ese horario el bot avisa que le responden cuando haya alguien.
   Feriados: tomarlos de una fuente automática (a definir) en vez de cargarlos a mano.
 - **Local**: Rioja 1869, Rosario. **Envíos**: solo comprando desde la página web (falta la URL).
+- **Medios de pago**: efectivo, débito, crédito, transferencia, Mercado Pago. Tarjetas bancarias: 3 cuotas sin
+  interés. En la página: 10% de descuento con transferencia. Hay promos en el local (definir después).
 - **Precio que informa el bot**: LISTA MOSTRADOR.
 - **Asesoramiento**: Claude (API de Anthropic) + Google Books API (gratis; cuota a ver en la consola de Google),
   recomendando solo lo que esté en stock.
@@ -34,7 +38,7 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 - developers.facebook.com está bloqueado en la red de las sesiones en la nube: habilitarlo para leer la doc oficial.
 
 ## Pendiente (preguntas al usuario)
-- Medios de pago y URL de la página web.
+- URL de la página web. Confirmar si "stock solo de La Mandrágora" (respuesta "1 sí" ambigua).
 - Cuentas: el usuario tiene cuenta personal de Meta (no a nombre de La Mandrágora) y **no** tiene cuenta en la
   consola de Anthropic. Hay que crear un portfolio comercial (Meta Business) a nombre de La Mandrágora desde su
   cuenta, y una cuenta en console.anthropic.com con crédito. Guiarlo cuando se elija el proveedor.
