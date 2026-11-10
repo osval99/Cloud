@@ -56,6 +56,9 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
   dice que se cobran las de personas, pero habla de la API; un tercero (Chakra) dice que las de la app son gratis.
 - **Alternativa a evaluar: Meta Business Agent** (IA propia de Meta): US$2 por millón de tokens, ~US$0,04-0,05
   por respuesta, y reemplaza el cobro del mensaje de servicio. No se sabe si puede leer el stock de Fierro.
+  **Comparación (10/11/2026, 3.600 respuestas/mes)**: bot propio ~US$33-83/mes (Meta + IA, según la tarifa de
+  Argentina) contra Meta Business Agent ~US$144-180/mes. El propio sale 2 a 5 veces más barato salvo que la tarifa
+  de Argentina supere ~US$0,035 por mensaje. Con menos de 1.000 respuestas/mes, el propio solo paga la IA.
 - **IA (Claude), estimación 10/11/2026** con precios oficiales por millón de tokens (entrada/salida): Haiku 5.5
   US$0,10/0,50; Sonnet 5.5 US$2/10 (lectura de caché US$0,10); Opus 5.5 US$4/20. Supuestos: ~4.000 tokens de
   entrada y ~600 de salida por mensaje; 120 mensajes/día (~3.600/mes). Resultado: Haiku ~US$2,5/mes,
