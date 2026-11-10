@@ -48,6 +48,11 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 ## Costos (no verificados en fuentes oficiales)
 - Meta: respuestas a clientes gratis desde 11/2024 (oficial). Terceros dicen que desde 1/10/2026 hay 1.000
   gratis/mes y luego ~US$0,026 por mensaje de servicio en Argentina. Confirmar en la tarifa de Meta.
+- **IA (Claude), estimación 10/11/2026** con precios oficiales por millón de tokens (entrada/salida): Haiku 5.5
+  US$0,10/0,50; Sonnet 5.5 US$2/10 (lectura de caché US$0,10); Opus 5.5 US$4/20. Supuestos: ~4.000 tokens de
+  entrada y ~600 de salida por mensaje; 120 mensajes/día (~3.600/mes). Resultado: Haiku ~US$2,5/mes,
+  Sonnet ~US$37-50/mes, Opus ~US$100/mes. Propuesta: Haiku para precio/stock/horario y Sonnet para asesorar
+  (~US$10-20/mes). Volumen real de consultas: **falta que el usuario lo estime**. Poner límite de gasto en la consola.
 - **Twilio (página oficial de soporte)** confirma que desde 10/2026 Meta cobra los mensajes de servicio enviados
   por API. Las respuestas que el humano manda desde la app/WhatsApp Web en coexistencia serían gratis (terceros).
 - **Proveedores con coexistencia** (comparado 10/11/2026; todos sin recargo sobre la tarifa de Meta, salvo Twilio):
