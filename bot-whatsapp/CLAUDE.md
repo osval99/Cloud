@@ -1,7 +1,7 @@
 # Bot de WhatsApp — La Mandrágora
 
 Bot que responde precio, stock y horarios, y asesora sobre libros usando Google Books.
-**Estado: en diseño** (todavía no hay código).
+**Estado: en diseño** (todavía no hay código). El usuario pidió **no avanzar con la implementación** hasta que lo diga.
 
 ## Decisiones tomadas (10/11/2026)
 - **Número**: el actual del local, con **coexistencia** (app WhatsApp Business + Cloud API en el mismo número).
@@ -34,7 +34,13 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 ## Costos (no verificados en fuentes oficiales)
 - Meta: respuestas a clientes gratis desde 11/2024 (oficial). Terceros dicen que desde 1/10/2026 hay 1.000
   gratis/mes y luego ~US$0,026 por mensaje de servicio en Argentina. Confirmar en la tarifa de Meta.
-- Proveedor de coexistencia: precio a comparar.
+- **Twilio (página oficial de soporte)** confirma que desde 10/2026 Meta cobra los mensajes de servicio enviados
+  por API. Las respuestas que el humano manda desde la app/WhatsApp Web en coexistencia serían gratis (terceros).
+- **Proveedores con coexistencia** (comparado 10/11/2026; todos sin recargo sobre la tarifa de Meta, salvo Twilio):
+  - **YCloud**: plan gratis + Growth US$39/mes y Pro US$89/mes (datos de su propia web). Coexistencia anunciada.
+    Falta confirmar si el plan gratis incluye API/webhooks y coexistencia. **Recomendado para verificar primero.**
+  - **360dialog**: €49/mes por número (Regular), oficial. API pura, pensada para bots propios. Coexistencia sí.
+  - **Twilio**: sin cuota fija, US$0,005 por mensaje enviado o recibido + Meta. Soporte de coexistencia sin confirmar.
 - developers.facebook.com está bloqueado en la red de las sesiones en la nube: habilitarlo para leer la doc oficial.
 
 ## Pendiente (preguntas al usuario)
@@ -42,4 +48,3 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 - Cuentas: el usuario tiene cuenta personal de Meta (no a nombre de La Mandrágora) y **no** tiene cuenta en la
   consola de Anthropic. Hay que crear un portfolio comercial (Meta Business) a nombre de La Mandrágora desde su
   cuenta, y una cuenta en console.anthropic.com con crédito. Guiarlo cuando se elija el proveedor.
-- ¿Comparar 2-3 proveedores de coexistencia?
