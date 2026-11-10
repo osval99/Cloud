@@ -46,8 +46,16 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
   (se conecta con el proyecto `datos-tecnicos-libros/`). En la nube: openlibrary.org bloqueado y Google sin clave.
 
 ## Costos (no verificados en fuentes oficiales)
-- Meta: respuestas a clientes gratis desde 11/2024 (oficial). Terceros dicen que desde 1/10/2026 hay 1.000
-  gratis/mes y luego ~US$0,026 por mensaje de servicio en Argentina. Confirmar en la tarifa de Meta.
+- **Meta (artículo de SleekFlow del 22/10/2026, cita la tarifa oficial de Meta)**: desde el 1/10/2026 se cobra
+  **cada** mensaje de servicio, lo mande una persona o una IA, sin descuento por volumen. **1.000 gratis por mes
+  por número** (no se acumulan). La tarifa depende del país del cliente. Argentina no figura en el artículo; otras
+  fuentes de terceros dicen US$0,026. Sin medio de pago en el Billing Hub de Meta, los mensajes **no se entregan**.
+  Las conversaciones que empiezan desde un anuncio "Click to WhatsApp" o el botón de la página de Facebook son
+  gratis por 7 días. Mandar una respuesta en un solo mensaje, no en varios.
+- **Duda abierta**: si en coexistencia las respuestas desde la app/WhatsApp Web también se cobran. El artículo
+  dice que se cobran las de personas, pero habla de la API; un tercero (Chakra) dice que las de la app son gratis.
+- **Alternativa a evaluar: Meta Business Agent** (IA propia de Meta): US$2 por millón de tokens, ~US$0,04-0,05
+  por respuesta, y reemplaza el cobro del mensaje de servicio. No se sabe si puede leer el stock de Fierro.
 - **IA (Claude), estimación 10/11/2026** con precios oficiales por millón de tokens (entrada/salida): Haiku 5.5
   US$0,10/0,50; Sonnet 5.5 US$2/10 (lectura de caché US$0,10); Opus 5.5 US$4/20. Supuestos: ~4.000 tokens de
   entrada y ~600 de salida por mensaje; 120 mensajes/día (~3.600/mes). Resultado: Haiku ~US$2,5/mes,
