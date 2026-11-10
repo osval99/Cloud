@@ -31,6 +31,15 @@ Bot que responde precio, stock y horarios, y asesora sobre libros usando Google 
 - **Asesoramiento**: Claude (API de Anthropic) + Google Books API (gratis; cuota a ver en la consola de Google),
   recomendando solo lo que esté en stock.
 
+## Asesoramiento por temas / contenido (análisis 10/11/2026)
+- Enfoque propuesto: **catálogo enriquecido propio**. Por cada ISBN en stock se busca una vez (y luego solo los
+  nuevos) sinopsis + categorías y se guardan. El bot busca por tema en ese catálogo (búsqueda semántica) y solo
+  recomienda lo que hay. No consultar Google en vivo por cada mensaje (cuota y lentitud).
+- Fuentes: Google Books (principal; requiere **clave propia**: sin clave la cuota compartida da 0), Open Library,
+  DILVE (España, ONIX, requiere usuario), webs de editoriales; conocimiento de Claude solo como apoyo y avisando.
+- **Sin medir todavía** qué % del catálogo tiene sinopsis. Probarlo con 100-200 ISBNs de una exportación de Fierro
+  (se conecta con el proyecto `datos-tecnicos-libros/`). En la nube: openlibrary.org bloqueado y Google sin clave.
+
 ## Costos (no verificados en fuentes oficiales)
 - Meta: respuestas a clientes gratis desde 11/2024 (oficial). Terceros dicen que desde 1/10/2026 hay 1.000
   gratis/mes y luego ~US$0,026 por mensaje de servicio en Argentina. Confirmar en la tarifa de Meta.
