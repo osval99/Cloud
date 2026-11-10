@@ -25,6 +25,7 @@ Al terminar cada tarea, antes del commit final:
 ## Proyectos
 | Carpeta | Descripción |
 |---------|-------------|
+| `busqueda-ssd/` | Búsqueda periódica del SSD externo más barato en Mercado Libre (top 10 + Excel) |
 | `datos-tecnicos-libros/` | Buscar datos técnicos de libros a partir de ISBNs (en definición) |
 | `escaner-fierro/` | PWA que escanea códigos de barra y los pasa a Fierro |
 | `fierro/` | Manejo del ERP Fierro por pantalla (`cu.py`, reposición, facturas de compra); se usa desde `~/fierro-claude/` (enlaces) |
