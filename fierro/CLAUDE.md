@@ -141,13 +141,15 @@ Método acordado con el usuario (comando `/reposicion`):
 - 5/11/2026: FC B 00028-00046099 (13/10, $4.697.445,00, 242 ej.) y FC B 00028-00046234 (28/10, $2.274.600,00,
   108 ej., generó crédito CD 523, saldo $2.118.000). La 00028-00045701 ya estaba.
 
-## Remitos de consignación de Planeta: LIBRERIA → La Mandrágora
+## Remitos de consignación de Planeta, PRH y Santillana: LIBRERIA → La Mandrágora
 
-Procedimiento reiterado (pedido del usuario, 10/11/2026). Todo se hace **con sesión en La Mandrágora**, eligiendo
-Sucursal y Depósito en cada remito (no hace falta loguearse en LIBRERIA):
+Procedimiento reiterado para los remitos de consignación de **Planeta (`PLA`), Penguin Random House (`SUD`, EDITORIAL
+SUDAMERICANA) y Santillana** (hay dos: `san` EDICIONES SANTILLANA S.A. y `gs` GRUPO SANTILLANA; usar el que traiga el
+mensaje SINLI o confirmar con el usuario). Pedido del usuario, 10/11/2026. Todo se hace **con sesión en La Mandrágora**,
+eligiendo Sucursal y Depósito en cada remito (no hace falta loguearse en LIBRERIA):
 
-1. **Remito de Planeta en LIBRERIA**: Compras > Remitos > Ctrl+N. **Primero** Sucursal `LIBRERIA` y Depósito
-   `LIBRERIA`, después Proveedor `PLA` + Tab → bandeja SINLI (si el mensaje ya está procesado, Cancelar y cargar a
+1. **Remito del proveedor en LIBRERIA**: Compras > Remitos > Ctrl+N. **Primero** Sucursal `LIBRERIA` y Depósito
+   `LIBRERIA`, después el código del proveedor + Tab → bandeja SINLI (si el mensaje ya está procesado, Cancelar y cargar a
    mano). Tipo Consignación, número (de a un dígito por tramo), fecha del remito, renglones.
    Error a evitar: cargarlo en La Mandrágora/Sucursal3 (no se puede cambiar sucursal ni depósito después; solo
    eliminar el remito y recargarlo).
