@@ -40,6 +40,7 @@ Consejos:
 - En menús y listas el teclado (Down/Right/Escape) es más fiable que el mouse.
 - En listas, la búsqueda por escritura se corta en espacios y acentos: escribir solo la primera palabra y bajar con Down.
 - Campos de fecha (máscara dd/mm/aaaa): clic, `key Home`, escribir los 8 dígitos.
+- En Facturas de compra, el filtro **Número** busca en todas las sucursales (el combo Sucursal no lo limita).
 - El botón Buscar a veces no responde: usar **Ctrl+B** (Ventana Activa > Herramientas de búsqueda > Búsqueda).
 - Diálogos más grandes que la pantalla (ej. "Guardar como..."): `fit <id>` y escribir la ruta completa en "Nombre".
 
@@ -105,6 +106,60 @@ Método acordado con el usuario (comando `/reposicion`):
 - 3/11/2026: FG 14-00000448 Macao 457 ej $1.371.000 y FG 14-00000449 Patres 462 ej $1.386.000 (remitos del 18/10/2026).
 - ARCA avisa que desde el **01/12/2026** rechaza comprobantes sin "Condición frente al IVA del receptor": revisar
   que Fierro lo envíe antes de esa fecha.
+
+## Comprobantes de Planeta (comfiar) en DISTRIBUIDORA
+
+- Llegan a mandrake.dis desde acliente.eplaneta@la.comfiar.com.ar ("Aviso de emisión del comprobante (Factura B / Nota de
+  Crédito B) Nro …"). Link "DESCARGAR" → `planeta_comprobantes.py` (IMAP, lo corre el usuario) o, con el conector de
+  Gmail, sacar los links y bajar con `bajar_pdf()` del mismo script. PDFs y `resumen.csv` en `facturas/planeta/`.
+- **Solo cuenta 1006187** (DISTRIBUIDORA; la 1005707 es la otra). El punto de venta (0028/0032) no indica la cuenta:
+  mirar "001006187 SHCOLER…" en cada PDF.
+- Facturas → Facturas de compra > ícono **FG**: proveedor `PLA` + Tab, letra B, tipo "Factura general", número (de a un
+  dígito, como en PRH), fecha, vencimiento del PDF, importe total, IVA 0, descripción `dd/mm/aaaa vto Nej. importe`
+  (modelo FG B 00028-00045711). Aceptar → Sí.
+- Notas de crédito → Compras > Créditos > ícono **NG** "nota de crédito general (sin ejemplares)": `PLA` + Tab, motivo
+  "Faltantes" ("NOTA DE CRÉDITO POR FALTANTE") o "Error de facturación", letra B, número, fecha, importe, descripción
+  `dd/mm/aaaa Nej. importe FB 0028-xxxxx`. Aceptar → Sí.
+- 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
+  → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
+
+## Facturas de Planeta (SINLI) en LIBRERIA
+
+- Cuenta Planeta **1005707** = sucursal **LIBRERIA** (el usuario inicia sesión ahí). Las declaraciones de ventas
+  ("DECLARACION DE VENTAS <mes>") son **Baja Consignación**.
+- Se cargan por **SINLI**: Compras > Facturas > ícono **FC** "Ingresar una nueva factura" → Proveedor `PLA` + Tab →
+  se abre "Selección de mensajes" (bandeja SINLI) → elegir la factura → Aceptar. Fierro completa tipo, número,
+  fechas y renglones.
+- Avisos "¿Desea cambiar el precio … LISTA MOSTRADOR?" uno por libro: **nunca bajar precios** → "No" si el nuevo es
+  menor (script OCR con tesseract en capturas, recorte 467 261 873 372, botón No en 719 408); si sube, consultar.
+- Corregir a mano: letra **B** (en el combo está arriba de la C, hay que subir con scroll) y punto de venta del
+  número (`00028`, de a un dígito). Formas de Pago → "Ingresar pago de cuenta corriente" → Aceptar.
+- Aceptar → Sí (guardar) → Sí (marcar el mensaje como procesado).
+- "Liquidación por conciliación" = libros que Planeta pidió en devolución y no devolvimos (no aparecieron o nos los
+  quedamos). Fierro avisa "ítems no asignados a remitos… creará un crédito" y "precio distinto al del pedido de baja":
+  contestar **Sí** (criterio del usuario; puede haber errores nuestros). Crédito generado: no imprimir.
+- 5/11/2026: FC B 00028-00046099 (13/10, $4.697.445,00, 242 ej.) y FC B 00028-00046234 (28/10, $2.274.600,00,
+  108 ej., generó crédito CD 523, saldo $2.118.000). La 00028-00045701 ya estaba.
+
+## Remitos de consignación de Planeta: LIBRERIA → La Mandrágora
+
+Procedimiento reiterado (pedido del usuario, 10/11/2026). Todo se hace **con sesión en La Mandrágora**, eligiendo
+Sucursal y Depósito en cada remito (no hace falta loguearse en LIBRERIA):
+
+1. **Remito de Planeta en LIBRERIA**: Compras > Remitos > Ctrl+N. **Primero** Sucursal `LIBRERIA` y Depósito
+   `LIBRERIA`, después Proveedor `PLA` + Tab → bandeja SINLI (si el mensaje ya está procesado, Cancelar y cargar a
+   mano). Tipo Consignación, número (de a un dígito por tramo), fecha del remito, renglones.
+   Error a evitar: cargarlo en La Mandrágora/Sucursal3 (no se puede cambiar sucursal ni depósito después; solo
+   eliminar el remito y recargarlo).
+2. **Reconsignación**: Ventas > Remitos > ícono RE "Ingresar un remito". Cliente **`mandrag`** MANDRAKE LIBROS (COOP)
+   (buscar con la lupa; no el 315), Tipo Consignación, Sucursal y Depósito `LIBRERIA`, mismos libros y cantidades.
+   Aceptar → Sí → "¿Desea imprimirlo?" **No**. Fierro numera solo (ej. RE 1-1855).
+3. **Recepción en La Mandrágora**: Compras > Remitos > Ctrl+N, Proveedor **`OS`** (Mandrake Libros), Sucursal
+   La Mandrágora / Depósito Sucursal3, Tipo Consignación, **número = el del remito de venta de LIBRERIA**
+   (1-1855 → `00001-00001855`), fecha del paso 2, mismos renglones. Aviso "proveedor principal distinto" → Sí. Aceptar → Sí.
+- En los remitos de compra, **Enter en Cantidad agrega el renglón y abre "¿guardar?"**: usar el botón Agregar.
+- 10/11/2026: RE 00014-00186011 (Planeta, 27/10, 50 ej. 9786310200217 LA HORA ANTES DEL ALBA) recargado en LIBRERIA →
+  RE venta 1-1855 a mandrag → RE compra 00001-00001855 de OS en La Mandrágora.
 
 ## Segunda pantalla
 
