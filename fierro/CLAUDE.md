@@ -123,6 +123,46 @@ Método acordado con el usuario (comando `/reposicion`):
 - 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
   → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
 
+## Facturas de Planeta (SINLI) en LIBRERIA
+
+- Cuenta Planeta **1005707** = sucursal **LIBRERIA** (el usuario inicia sesión ahí). Las declaraciones de ventas
+  ("DECLARACION DE VENTAS <mes>") son **Baja Consignación**.
+- Se cargan por **SINLI**: Compras > Facturas > ícono **FC** "Ingresar una nueva factura" → Proveedor `PLA` + Tab →
+  se abre "Selección de mensajes" (bandeja SINLI) → elegir la factura → Aceptar. Fierro completa tipo, número,
+  fechas y renglones.
+- Avisos "¿Desea cambiar el precio … LISTA MOSTRADOR?" uno por libro: **nunca bajar precios** → "No" si el nuevo es
+  menor (script OCR con tesseract en capturas, recorte 467 261 873 372, botón No en 719 408); si sube, consultar.
+- Corregir a mano: letra **B** (en el combo está arriba de la C, hay que subir con scroll) y punto de venta del
+  número (`00028`, de a un dígito). Formas de Pago → "Ingresar pago de cuenta corriente" → Aceptar.
+- Aceptar → Sí (guardar) → Sí (marcar el mensaje como procesado).
+- "Liquidación por conciliación" = libros que Planeta pidió en devolución y no devolvimos (no aparecieron o nos los
+  quedamos). Fierro avisa "ítems no asignados a remitos… creará un crédito" y "precio distinto al del pedido de baja":
+  contestar **Sí** (criterio del usuario; puede haber errores nuestros). Crédito generado: no imprimir.
+- 5/11/2026: FC B 00028-00046099 (13/10, $4.697.445,00, 242 ej.) y FC B 00028-00046234 (28/10, $2.274.600,00,
+  108 ej., generó crédito CD 523, saldo $2.118.000). La 00028-00045701 ya estaba.
+
+## Remitos de consignación de Planeta, PRH y Santillana: LIBRERIA → La Mandrágora
+
+Procedimiento reiterado para los remitos de consignación de **Planeta (`PLA`), Penguin Random House (`SUD`, EDITORIAL
+SUDAMERICANA) y Santillana** (hay dos: `san` EDICIONES SANTILLANA S.A. y `gs` GRUPO SANTILLANA; usar el que traiga el
+mensaje SINLI o confirmar con el usuario). Pedido del usuario, 10/11/2026. Todo se hace **con sesión en La Mandrágora**,
+eligiendo Sucursal y Depósito en cada remito (no hace falta loguearse en LIBRERIA):
+
+1. **Remito del proveedor en LIBRERIA**: Compras > Remitos > Ctrl+N. **Primero** Sucursal `LIBRERIA` y Depósito
+   `LIBRERIA`, después el código del proveedor + Tab → bandeja SINLI (si el mensaje ya está procesado, Cancelar y cargar a
+   mano). Tipo Consignación, número (de a un dígito por tramo), fecha del remito, renglones.
+   Error a evitar: cargarlo en La Mandrágora/Sucursal3 (no se puede cambiar sucursal ni depósito después; solo
+   eliminar el remito y recargarlo).
+2. **Reconsignación**: Ventas > Remitos > ícono RE "Ingresar un remito". Cliente **`mandrag`** MANDRAKE LIBROS (COOP)
+   (buscar con la lupa; no el 315), Tipo Consignación, Sucursal y Depósito `LIBRERIA`, mismos libros y cantidades.
+   Aceptar → Sí → "¿Desea imprimirlo?" **No**. Fierro numera solo (ej. RE 1-1855).
+3. **Recepción en La Mandrágora**: Compras > Remitos > Ctrl+N, Proveedor **`OS`** (Mandrake Libros), Sucursal
+   La Mandrágora / Depósito Sucursal3, Tipo Consignación, **número = el del remito de venta de LIBRERIA**
+   (1-1855 → `00001-00001855`), fecha del paso 2, mismos renglones. Aviso "proveedor principal distinto" → Sí. Aceptar → Sí.
+- En los remitos de compra, **Enter en Cantidad agrega el renglón y abre "¿guardar?"**: usar el botón Agregar.
+- 10/11/2026: RE 00014-00186011 (Planeta, 27/10, 50 ej. 9786310200217 LA HORA ANTES DEL ALBA) recargado en LIBRERIA →
+  RE venta 1-1855 a mandrag → RE compra 00001-00001855 de OS en La Mandrágora.
+
 ## Libros duplicados (mismo ISBN y mismo carácter)
 
 - Fierro no tiene reporte de duplicados. El usuario **no quiere exportaciones que queden fuera del sistema**: se usa
