@@ -32,6 +32,7 @@ Al terminar cada tarea, antes del commit final:
 | `fierro/` | Manejo del ERP Fierro por pantalla (`cu.py`, reposición, facturas de compra); se usa desde `~/fierro-claude/` (enlaces) |
 | `finanzas/` | Estrategia de manejo de liquidez en pesos |
 | `mantenimiento-pc/` | Datos y tareas de mantenimiento de la PC (Windows 10) |
+| `pvp-libros/` | PVP en pesos de listas de libros por ISBN (Cúspide) |
 | `precios-mandrake/` | Scripts Python para actualizar precios de Librería Mandrake vía Gmail |
 
 ## Entorno
