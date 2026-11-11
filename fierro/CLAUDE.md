@@ -33,6 +33,7 @@ Ejecutar siempre como `python3 -I /home/oficina1/fierro-claude/cu.py …` (traba
 - `click X Y [botón] [veces]` (botón 3 = derecho), `move X Y`, `scroll X Y up|down [n]`
 - `type "texto"` (acentos ok), `key Return Escape Down ctrl+b …`
 - `fit <id>` estira una ventana a la pantalla; `shotwin <id>` captura una ventana.
+- **Alt trabada**: `click`/`move`/`type`/`key`/`scroll` sueltan solos Alt/Ctrl/Shift trabadas antes de actuar (solo en `:5`/`:6`); `soltar` lo hace a mano. Para Ctrl+clic con Ctrl apretado aparte: `CU_NO_SOLTAR=1`.
 - Ids de ventanas: `DISPLAY=:5 xwininfo -root -tree | grep '"fierro" "Fierro"'`
 
 Consejos:
@@ -104,6 +105,11 @@ Método acordado con el usuario (comando `/reposicion`):
   seleccionar la factura e ícono "Imprimir factura de venta": abre el visor con `/tmp/tmpXXXX.pdf`; copiarlo.
 - Guardar en `~/Documentos/Saldos PLaneta 05102026/` como `<Cliente> Factura Saldos <número>.pdf` y mandarlos a RC.
 - 3/11/2026: FG 14-00000448 Macao 457 ej $1.371.000 y FG 14-00000449 Patres 462 ej $1.386.000 (remitos del 18/10/2026).
+- 11/11/2026: FG 14-00000457 Malapalabra (`Mala`, con mail: Fierro se la mandó sola) 95 ej $285.000, vto 11/12/2026
+  (pedido `MALAPALABRA PEDIDO SALDOS 18102026.xlsx`). Con :5 y :6 ocupadas se abrió `:7` ("Fierro (Claude 3)"), ya logueado en DISTRIBUIDORA.
+  **El precio era $3.500**: se anuló con NC 14-00000020 ($285.000, Ventas > Notas de Crédito > ícono **CG** "nota de crédito
+  general", PV "14 - NC Distribución Mayorista", motivo "Error en factura", cuenta corriente; Fierro pregunta "¿Desea obtener
+  el CAE?" → Sí; no la mandó por mail al cliente) y se refacturó FG 14-00000458 $332.500 (95 × $3.500).
 - ARCA avisa que desde el **01/12/2026** rechaza comprobantes sin "Condición frente al IVA del receptor": revisar
   que Fierro lo envíe antes de esa fecha.
 
@@ -138,6 +144,17 @@ Método acordado con el usuario (comando `/reposicion`):
 - "Liquidación por conciliación" = libros que Planeta pidió en devolución y no devolvimos (no aparecieron o nos los
   quedamos). Fierro avisa "ítems no asignados a remitos… creará un crédito" y "precio distinto al del pedido de baja":
   contestar **Sí** (criterio del usuario; puede haber errores nuestros). Crédito generado: no imprimir.
+- **Facturas en firme (y saldos 0032) no vienen por SINLI. Regla del usuario: una factura se carga solo sobre un
+  remito ya ingresado.** Antes de cargarla, buscar en Compras > Remitos el remito que figura en el PDF. Si no está, la
+  mercadería no llegó o hubo un error de recepción (se ve en el stock negativo de esos libros): **no cargar la
+  factura**, avisar qué remito falta. Nunca contestar "Sí" al aviso "ítems no asignados a remitos… creará un crédito".
+  Error del 11/11/2026: se cargó FC B 00032-00008674 sin su remito 22-000001396 → crédito CD 524 por el total;
+  se borraron las dos (al eliminar la factura, Fierro borra también el crédito relacionado).
+- Importar renglones desde CSV (factura o remito): Ventana Activa > Importar documento desde CSV (formato Excel,
+  línea 2, Cantidad col. 2, Código col. 1 ISBN, Precio col. 3, Descuento col. 4, separador decimal "."; CSV armado
+  desde el PDF con `pdftotext`).
+- 11/11/2026: FC B 00028-00046338 (05/11, $1.172.500, SINLI). Sin cargar 0028-46331 (remito 20-000186290) y
+  0028-46382 (remito 20-000186584): remitos no ingresados.
 - 5/11/2026: FC B 00028-00046099 (13/10, $4.697.445,00, 242 ej.) y FC B 00028-00046234 (28/10, $2.274.600,00,
   108 ej., generó crédito CD 523, saldo $2.118.000). La 00028-00045701 ya estaba.
 
