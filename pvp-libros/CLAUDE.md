@@ -18,5 +18,7 @@ Bajar el precio de venta al público (pesos) de listas de libros por ISBN.
   (11/11/2026); 86 ISBN no están en Cúspide.
 
 ## Pendientes
-- Opcional: para los 86 faltantes, buscar en Cúspide la edición argentina del mismo título (marcar ISBN distinto).
+- 86 faltantes: hoja "Faltantes Buscalibre" del Excel (links por ISBN, columna PVP vacía). Buscalibre tiene
+  verificación anti-bot: no esquivarla. Completar desde la PC con una sesión local + extensión Claude in Chrome
+  (el usuario resuelve la verificación) o a mano. Alternativa: edición argentina en Cúspide (marcar ISBN distinto).
 - Lista de saldos Planeta (16/10/2026, 156 títulos) quedó sin PVP: necesitaría habilitar planetadelibros.com.ar.
