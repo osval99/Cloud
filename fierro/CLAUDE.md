@@ -110,6 +110,8 @@ Método acordado con el usuario (comando `/reposicion`):
   **El precio era $3.500**: se anuló con NC 14-00000020 ($285.000, Ventas > Notas de Crédito > ícono **CG** "nota de crédito
   general", PV "14 - NC Distribución Mayorista", motivo "Error en factura", cuenta corriente; Fierro pregunta "¿Desea obtener
   el CAE?" → Sí; no la mandó por mail al cliente) y se refacturó FG 14-00000458 $332.500 (95 × $3.500).
+- **Envío automático de facturas por mail desactivado en DISTRIBUIDORA** (11/11/2026): Sistema > Parámetros, `SaleBillAutomaticMail`
+  = False con Sucursal DISTRIBUIDORA (hecho con **Crear**; Modificar sobre la fila general no deja editar). Todo va a RC.
 - ARCA avisa que desde el **01/12/2026** rechaza comprobantes sin "Condición frente al IVA del receptor": revisar
   que Fierro lo envíe antes de esa fecha.
 

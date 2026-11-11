@@ -8,6 +8,8 @@ Uso:
   cu.py type "texto"
   cu.py key Return|Tab|Escape|F2|ctrl+a ...
   cu.py scroll X Y up|down [n]
+  cu.py soltar                            suelta Alt/Ctrl/Shift trabadas (click/move/type/key/scroll
+                                          ya lo hacen antes de actuar; CU_NO_SOLTAR=1 lo desactiva)
 
 Por defecto trabaja en la pantalla virtual :5 (Xephyr), donde solo corre Fierro.
 CU_DISPLAY=:1 para el escritorio real (ahí guard() exige que la ventana activa sea Fierro).
@@ -95,6 +97,29 @@ def guard():
     cls = active_class()
     if "fierro" not in cls:
         sys.exit(f"CANCELADO: la ventana activa no es Fierro ({cls or 'desconocida'})")
+
+
+def soltar_trabadas(verbose=False):
+    """Suelta modificadores que quedaron apretados (pasa seguido con Alt en :5).
+
+    Solo en las pantallas virtuales: en :1 el teclado es el del usuario."""
+    if DISPLAY == ":1" or os.environ.get("CU_NO_SOLTAR"):
+        return []  # CU_NO_SOLTAR=1: para Ctrl+clic con Ctrl apretado aparte
+    d = dpy()
+    mapa = (ctypes.c_char * 32)()
+    X11.XQueryKeymap(d, mapa)
+    mods = {_kc(n) for n in ("Alt_L", "Alt_R", "Control_L", "Control_R", "Shift_L", "Shift_R",
+                             "ISO_Level3_Shift", "Super_L", "Meta_L")} - {0}
+    trabadas = [kc for kc in mods if mapa[kc // 8][0] >> (kc % 8) & 1]
+    for kc in trabadas:
+        XTST.XTestFakeKeyEvent(d, kc, 0, 0)
+    if trabadas:
+        X11.XFlush(d)
+        time.sleep(0.05)
+    if verbose or trabadas:
+        print(f"Teclas trabadas soltadas: {trabadas}" if trabadas else "No había teclas trabadas",
+              file=sys.stderr)
+    return trabadas
 
 
 def move(x, y):
@@ -228,6 +253,9 @@ if __name__ == "__main__":
         print(active_class() or "desconocida")
     elif cmd in ("click", "move", "type", "key", "scroll"):
         guard()
+        soltar_trabadas()
+    elif cmd == "soltar":
+        soltar_trabadas(verbose=True)
     if cmd == "click":
         click(int(a[1]), int(a[2]), int(a[3]) if len(a) > 3 else 1, int(a[4]) if len(a) > 4 else 1)
     elif cmd == "move":
