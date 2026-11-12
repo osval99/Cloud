@@ -98,8 +98,9 @@ Método acordado con el usuario (comando `/reposicion`):
   "Hola Mariana. / Te paso un pedido para distribución." … "Besos / os" + firma. Mariana suele preguntar si es firme: sí.
 - Con el conector de Gmail, `forward` envía en el acto y no deja cambiar el asunto: en su lugar se baja el adjunto y se
   arma un **borrador** con `create_draft` (mismo texto, `includeSignature`, Excel como referencia `sha256:`). Nunca enviar
-  sin el visto bueno del usuario.
-- 12/11/2026: borrador del pedido de RC del 11/11 (`PEDIDO 11112026 PRH.xlsx`), pendiente de que el usuario lo envíe.
+  sin el visto bueno del usuario (con su ok, `send_message` con el `draftId`).
+- Una vez enviado, poner al mail de RC la etiqueta **Resuelto** (`Label_7027701249900588394`) para saber que ya se pasó.
+- 12/11/2026: enviado a Mariana el pedido de RC del 11/11 (`PEDIDO 11112026 PRH.xlsx`); mail de RC marcado Resuelto.
 
 ## Facturas de venta de saldos (Planeta) a clientes de RC
 
