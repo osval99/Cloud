@@ -89,6 +89,18 @@ Método acordado con el usuario (comando `/reposicion`):
   después **clic en el segundo tramo** y escribir `8 1 4 6 2`. Verificar con captura (Home y End).
 - Cargada así: FG B 00016-00081462 (24/08/2026, $877.939,70, 46 ej.) el 3/11/2026.
 
+## Pedidos de RC para PRH (DISTRIBUIDORA): reenvío por mail
+
+- RC manda a mandrake.dis "PEDIDO PARA PRH - ENVIAR A QUILMES" con un Excel (`PEDIDO <ddmmaaaa> PRH.xlsx`) y la
+  dirección de Quilmes. Se pasa a **Mariana.Labati@penguinrandomhouse.com** (ejecutiva de cuentas PRH).
+- El usuario lo hace con **Reenviar** sobre el mail de RC: asunto `Pedido para distribución - ENVIAR A QUILMES`,
+  borra el saludo/firma de RC y el encabezado del reenvío, deja la dirección y "Recibe: Ricardo Cejas…", y pone
+  "Hola Mariana. / Te paso un pedido para distribución." … "Besos / os" + firma. Mariana suele preguntar si es firme: sí.
+- Con el conector de Gmail, `forward` envía en el acto y no deja cambiar el asunto: en su lugar se baja el adjunto y se
+  arma un **borrador** con `create_draft` (mismo texto, `includeSignature`, Excel como referencia `sha256:`). Nunca enviar
+  sin el visto bueno del usuario.
+- 12/11/2026: borrador del pedido de RC del 11/11 (`PEDIDO 11112026 PRH.xlsx`), pendiente de que el usuario lo envíe.
+
 ## Facturas de venta de saldos (Planeta) a clientes de RC
 
 - RC = Ricardo (rcquilmes@hotmail.com), maneja el depósito de Quilmes. Manda remitos (`Remito_Saldos_<cliente>_<fecha>.xlsx`).
