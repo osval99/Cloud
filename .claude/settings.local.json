@@ -1,7 +1,15 @@
 {
   "permissions": {
+    "defaultMode": "bypassPermissions",
     "allow": [
-      "Bash(gh auth *)"
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "WebFetch",
+      "WebSearch",
+      "mcp__claude-code-remote",
+      "mcp__claude_ai_Gmail"
     ]
   }
 }
