@@ -30,10 +30,11 @@ RC_MAIL = "rcquilmes@hotmail.com"
 # Id de Gmail del mail de RC (hex, como lo muestra la API) → factura y texto de la respuesta.
 RESPUESTAS = [
     # Id None = mail nuevo (no respuesta), con el asunto del 4.º elemento; 5.º opcional = destinatario (por defecto RC,
-    # y si es otro va con copia a RC).
-    (None, Path.home() / "Documentos" / "Saldos PLaneta 05102026" / "Malapalabra Nota de Credito 14-00000020.pdf",
-     "Estimado/a Malapalabra:\nAdjuntamos la Nota de Crédito C 0014-00000020, que anula la Factura C 0014-00000457 (precio unitario equivocado). La reemplaza la Factura C 0014-00000458 que les enviamos hoy.\nSaludos,\nMandrake Libros\n",
-     "Nota de Crédito C 0014-00000020 - Mandrake Libros", "casalibrera@gmail.com"),
+    # y si es otro va con copia a RC). El 2.º elemento puede ser un PDF o una lista de PDFs.
+    (None, [Path.home() / "Documentos" / "Saldos PLaneta 05102026" / "Planck AM Libros Factura Saldos 14-00000460.pdf",
+            Path.home() / "Documentos" / "Saldos PLaneta 05102026" / "AM Libros Mignani Nota de Credito 14-00000021.pdf"],
+     "Ricardo:\nPerdón, la factura FG 14-00000459 de ayer salió a nombre de Adrian Mignani y AM Libros ahora factura como PLANCK S.A.S. (CUIT 30-71920227-2).\nTe adjunto la factura correcta, FG 14-00000460 a PLANCK S.A.S. por $ 1.170.000 (390 libros de saldo a $ 3.000, e-cheq 30/60/90 días), y la nota de crédito NC 14-00000021 que anula la 459.\nAbrazo\nOsvaldo\n",
+     "Factura saldos AM Libros (PLANCK S.A.S.) FG 14-00000460 y NC 14-00000021"),
 ]
 
 
@@ -120,9 +121,11 @@ def main():
         r["Date"] = formatdate(localtime=True)
         r["Message-ID"] = make_msgid(domain="gmail.com")
         r.set_content(cuerpo)
-        r.add_attachment(pdf.read_bytes(), maintype="application", subtype="pdf", filename=pdf.name)
+        pdfs = pdf if isinstance(pdf, list) else [pdf]
+        for x in pdfs:
+            r.add_attachment(x.read_bytes(), maintype="application", subtype="pdf", filename=x.name)
 
-        print(f"{'(prueba) ' if probar else ''}→ {r['To']} | {r['Subject']} | adjunto {pdf.name} ({pdf.stat().st_size // 1024} KB)")
+        print(f"{'(prueba) ' if probar else ''}→ {r['To']} | {r['Subject']} | adjuntos " + ", ".join(f"{x.name} ({x.stat().st_size // 1024} KB)" for x in pdfs))
         if probar:
             continue
         if enviar:

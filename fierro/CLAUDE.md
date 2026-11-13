@@ -110,6 +110,17 @@ Método acordado con el usuario (comando `/reposicion`):
   **El precio era $3.500**: se anuló con NC 14-00000020 ($285.000, Ventas > Notas de Crédito > ícono **CG** "nota de crédito
   general", PV "14 - NC Distribución Mayorista", motivo "Error en factura", cuenta corriente; Fierro pregunta "¿Desea obtener
   el CAE?" → Sí; no la mandó por mail al cliente) y se refacturó FG 14-00000458 $332.500 (95 × $3.500).
+- 12-13/11/2026, AM Libros (Mignani): **error mío**: facturé FG 14-00000459 ($1.170.000, 390 ej) a la ficha vieja `MIG`
+  (Mignani Adrian, CUIT 20-20544608-8) en vez de crear el cliente nuevo; el usuario había mandado una imagen
+  "NUEVA RAZÓN SOCIAL PLANK S.A.S." que no vi. Se anuló con NC 14-00000021 (motivo "Error en factura") y se refacturó
+  **FG 14-00000460** al cliente nuevo **17691 PLANCK S.A.S.** (así figura en ARCA, con C; nombre fantasía AM Libros,
+  CUIT 30-71920227-2, Resp. inscripto, Garibaldi 61 Mendoza, CTA CTE MAY, CLIENTE MAYORISTA), vto 13/12/2026.
+  Al crear un cliente nuevo, Fierro le asigna código numérico (no se puede elegir).
+- **Antes de crear un cliente o proveedor, verificar en ARCA** (Constancia de inscripción,
+  seti.afip.gob.ar/padron-puc-constancia-internet; pide CAPTCHA: lo resuelve el usuario en el navegador integrado)
+  la razón social y la condición de IVA ("IVA" en impuestos registrados = Resp. inscripto; "IVA EXENTO" = Exento).
+  Si el usuario dice "creá este cliente", crear uno nuevo aunque haya una ficha parecida; si hay dudas, preguntar.
+- Para tener el PDF de una FG o NC: contestar **Sí** a "¿Desea imprimirla?" → abre evince con `/tmp/tmpXXXX.pdf`.
 - **Envío automático de facturas por mail desactivado en DISTRIBUIDORA** (11/11/2026): Sistema > Parámetros, `SaleBillAutomaticMail`
   = False con Sucursal DISTRIBUIDORA (hecho con **Crear**; Modificar sobre la fila general no deja editar). Todo va a RC.
 - ARCA avisa que desde el **01/12/2026** rechaza comprobantes sin "Condición frente al IVA del receptor": revisar
@@ -216,6 +227,18 @@ eligiendo Sucursal y Depósito en cada remito (no hace falta loguearse en LIBRER
   fallan ("Más de un libro tiene el código…"): se agregan a mano escribiendo el ISBN en Código + Enter, eligiendo la
   ficha en "Selección de libros" (el detalle muestra el código interno). Aunque se seleccionen varias, Aceptar agrega
   **solo una**: repetir por ficha. Al guardar, Fierro exige elegir un tipo de paquete.
+
+## Imprenta de ediciones propias (GRAFICA LAF)
+
+- Criterio del usuario (12/11/2026): las facturas de imprenta van como **proveedor normal** en Compras > Facturas >
+  ícono **FG** (Factura general), **no** en Caja y Bancos > Gastos.
+- Proveedor **761 GRAFICA LAF** (GRAFICA LAF SRL, CUIT 30-68844590-2, Resp. inscripto, Prov. de servicios, Contado).
+  Alta: Compras > Proveedores > "Crear un nuevo proveedor" (asistente; no tiene campos de IIBB ni inicio de actividades;
+  la localidad Villa Lynch no existe: se puso San Martin y "Monteagudo 741 - Villa Lynch" en el domicilio).
+- Pago en la misma FG: Formas de Pago → ícono "Ingresar pago con transferencia bancaria" → cuenta "Mercado Pago -
+  Cuenta 100210515119669", fecha de la transferencia.
+- 12/11/2026: FG B 00002-00001824 (12/11, $2.136.000, 500 ej. de 1984 y Noches blancas), pagada por transferencia MP
+  el 12/11, La Mandrágora.
 
 ## Segunda pantalla
 
