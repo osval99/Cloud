@@ -195,6 +195,8 @@ Método acordado con el usuario (comando `/reposicion`):
 - Importar renglones desde CSV (factura o remito): Ventana Activa > Importar documento desde CSV (formato Excel,
   línea 2, Cantidad col. 2, Código col. 1 ISBN, Precio col. 3, Descuento col. 4, separador decimal "."; CSV armado
   desde el PDF con `pdftotext`).
+- Pendiente (13/11/2026): FC B 00028-00046456 (12/11, $5.980.245, 286 ej.), declaración de ventas del PB 8684 (rotulada
+  "DV0926" igual que la 46099, pero es otra). Esperar el mensaje SINLI y cargarla en LIBRERIA.
 - 11/11/2026: FC B 00028-00046338 (05/11, $1.172.500, SINLI). Sin cargar 0028-46331 (remito 20-000186290) y
   0028-46382 (remito 20-000186584): remitos no ingresados.
 - 5/11/2026: FC B 00028-00046099 (13/10, $4.697.445,00, 242 ej.) y FC B 00028-00046234 (28/10, $2.274.600,00,
