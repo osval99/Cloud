@@ -154,6 +154,7 @@ Método acordado con el usuario (comando `/reposicion`):
   `dd/mm/aaaa Nej. importe FB 0028-xxxxx`. Aceptar → Sí.
 - 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
   → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
+- 13/11/2026: FG 0028-46350, 46375, 46473 y NG 0032-5503, 0028-10240 (faltantes) en `Cargado DIS 13-11-2026.csv`.
 
 ## Facturas de Planeta (SINLI) en LIBRERIA
 
