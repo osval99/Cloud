@@ -29,5 +29,8 @@ PWA de metrónomo configurable. HTML + JS puro, sin dependencias ni build (misma
   tap tempo, entrenador, ciclo de acentos, presets y persistencia al recargar; sin errores.
 - Sonido y precisión rítmica NO verificados en un dispositivo real.
 
-## Pendientes
-- Publicarla en hosting HTTPS (p. ej. GitHub Pages) para usarla desde el celular.
+## Dónde se usa
+- Publicada como página (artifact privado) en https://claude.ai/artifact/2LQFtuSznC7vBChENxa2Q5
+  — se abre directo en PC o celular. Es una copia de `index.html` sin service worker ni manifest
+  (no hacen falta ahí). Al cambiar `index.html`, volver a publicar esa misma URL.
+- Opción local: `python -m http.server 8000` DENTRO de la carpeta `metronomo` y abrir http://localhost:8000.
