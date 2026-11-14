@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metrónomo</title>
+<meta name="theme-color" content="#2E5E8C">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #F4F1EC; --card: #FFFFFF; --ink: #1F2933; --muted: #6B7280;
+    --line: #E2DDD5; --accent: #2E5E8C; --accent-soft: #DCE7F2; --hot: #D9822B;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14181D; --card: #1D232A; --ink: #E8EAED; --muted: #9AA3AD;
+            --line: #2C343D; --accent: #6FA3D6; --accent-soft: #24384D; --hot: #F0A050; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 16px 16px 40px; }
+  h1 { font-size: 1.1rem; margin: 4px 0 12px; color: var(--muted); font-weight: 600; text-align: center; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .card h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; }
+  button, select, input { font: inherit; color: inherit; }
+  button { background: var(--accent-soft); border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+  button:active { transform: scale(.97); }
+  select, input[type=number], input[type=text] { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; }
+  input[type=number] { width: 70px; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+  .row label { color: var(--muted); }
+  .grow { flex: 1; }
+
+  .tempo { text-align: center; }
+  #bpm { font-size: 4.5rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .unit { color: var(--muted); font-size: .9rem; }
+  #tempoName { color: var(--muted); font-size: .9rem; min-height: 1.2em; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+  #play { width: 100%; font-size: 1.3rem; font-weight: 700; padding: 16px; background: var(--accent); color: #fff; margin-top: 10px; }
+  #play.on { background: var(--hot); }
+  #tap { width: 100%; margin-top: 8px; padding: 14px; font-weight: 600; }
+
+  #beats { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 8px 0 4px; }
+  .beat { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); background: transparent;
+          padding: 0; display: grid; place-items: center; font-size: .8rem; font-weight: 700; color: var(--muted); }
+  .beat.acc { background: var(--accent-soft); color: var(--accent); border-width: 4px; }
+  .beat.mute { border-style: dashed; opacity: .45; }
+  .beat.now { background: var(--hot); border-color: var(--hot); color: #fff; }
+  .hint { color: var(--muted); font-size: .8rem; text-align: center; margin: 2px 0 0; }
+  #status { color: var(--muted); font-size: .9rem; text-align: center; min-height: 1.3em; margin-top: 8px; }
+
+  #presets { list-style: none; padding: 0; margin: 8px 0 0; }
+  #presets li { display: flex; gap: 6px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
+  #presets li span { flex: 1; }
+  #presets button { padding: 6px 10px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Metrónomo</h1>
+
+  <section class="card tempo">
+    <div id="bpm">120</div>
+    <div class="unit">BPM</div>
+    <div id="tempoName"></div>
+    <input id="bpmRange" type="range" min="30" max="300" value="120" aria-label="Velocidad">
+    <div class="steps">
+      <button data-step="-5">−5</button><button data-step="-1">−1</button>
+      <button data-step="1">+1</button><button data-step="5">+5</button>
+    </div>
+    <div id="beats"></div>
+    <p class="hint">Tocá un círculo: acento → normal → silencio</p>
+    <button id="play">▶ Iniciar</button>
+    <button id="tap">Tap tempo (tocá al ritmo)</button>
+    <div id="status"></div>
+  </section>
+
+  <section class="card">
+    <h2>Compás y subdivisión</h2>
+    <div class="row">
+      <label for="beatsN">Compás</label>
+      <select id="beatsN"></select> /
+      <select id="unitN"><option>4</option><option>8</option><option>2</option></select>
+    </div>
+    <div class="row">
+      <label for="subdiv">Subdivisión</label>
+      <select id="subdiv" class="grow">
+        <option value="1">Ninguna (solo tiempos)</option>
+        <option value="2">Corcheas (2 por tiempo)</option>
+        <option value="3">Tresillos (3 por tiempo)</option>
+        <option value="4">Semicorcheas (4 por tiempo)</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Sonido</h2>
+    <div class="row">
+      <label for="sound">Tipo</label>
+      <select id="sound" class="grow">
+        <option value="wood">Madera</option>
+        <option value="click">Click</option>
+        <option value="beep">Beep</option>
+        <option value="cowbell">Cencerro</option>
+      </select>
+      <button id="test">Probar</button>
+    </div>
+    <div class="row"><label for="vol">Volumen</label><input id="vol" class="grow" type="range" min="0" max="100" value="80"></div>
+    <div class="row"><label for="subVol">Vol. subdivisión</label><input id="subVol" class="grow" type="range" min="0" max="100" value="45"></div>
+    <div class="row"><label><input id="flash" type="checkbox" checked> Destello en pantalla</label></div>
+  </section>
+
+  <section class="card">
+    <h2>Entrenador de tempo</h2>
+    <div class="row"><label><input id="trOn" type="checkbox"> Subir la velocidad sola</label></div>
+    <div class="row">
+      <label>Subir</label><input id="trStep" type="number" min="1" max="50" value="5">
+      <label>BPM cada</label><input id="trBars" type="number" min="1" max="64" value="4"><label>compases</label>
+    </div>
+    <div class="row"><label>hasta</label><input id="trMax" type="number" min="30" max="300" value="160"><label>BPM</label></div>
+    <h2 style="margin-top:14px">Temporizador de práctica</h2>
+    <div class="row">
+      <label><input id="tmOn" type="checkbox"> Parar después de</label>
+      <input id="tmMin" type="number" min="1" max="180" value="10"><label>minutos</label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Configuraciones guardadas</h2>
+    <div class="row">
+      <input id="presetName" type="text" class="grow" placeholder="Nombre (ej.: Escalas lento)">
+      <button id="savePreset">Guardar</button>
+    </div>
+    <ul id="presets"></ul>
+  </section>
+</main>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const MIN = 30, MAX = 300;
+
+// ---------- Configuración persistente ----------
+const DEFAULT = { bpm: 120, beats: 4, unit: 4, accents: [2,1,1,1], subdiv: 1, sound: "wood",
+  vol: 80, subVol: 45, flash: true, trOn: false, trStep: 5, trBars: 4, trMax: 160, tmOn: false, tmMin: 10 };
+function load(key, def) { try { const v = JSON.parse(localStorage.getItem(key)); return v ?? def; } catch { return def; } }
+function save(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }
+let cfg = Object.assign({}, DEFAULT, load("metro.cfg", {}));
+let presets = load("metro.presets", []);
+
+// ---------- Audio ----------
+let ctx = null, master = null;
+function audio() {
+  if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.connect(ctx.destination); }
+  if (ctx.state === "suspended") ctx.resume();
+  return ctx;
+}
+// level: 2 = acento, 1 = normal, 0.5 = subdivisión
+function playSound(t, level) {
+  const vol = (level === 0.5 ? cfg.subVol : cfg.vol) / 100 * (level === 2 ? 1 : 0.6);
+  if (vol <= 0) return;
+  const g = ctx.createGain(); g.connect(master);
+  const hi = level === 2, sub = level === 0.5;
+  const env = (attack, decay, peak) => {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
+  };
+  const osc = (type, f, dur) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.connect(g); o.start(t); o.stop(t + dur); return o; };
+  switch (cfg.sound) {
+    case "click": {
+      const len = Math.floor(ctx.sampleRate * 0.03), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = hi ? 4000 : sub ? 2000 : 2800; f.Q.value = 1.5;
+      src.connect(f); f.connect(g); g.gain.setValueAtTime(vol * 3, t); src.start(t);
+      break;
+    }
+    case "beep": env(0.002, 0.08, vol); osc("square", hi ? 1760 : sub ? 660 : 880, 0.1); break;
+    case "cowbell": env(0.002, 0.25, vol * 0.6); osc("square", hi ? 800 : 540, 0.3); osc("square", hi ? 1200 : 810, 0.3); break;
+    default: { // madera
+      env(0.001, 0.05, vol);
+      const o = osc("sine", hi ? 1500 : sub ? 900 : 1100, 0.07); o.frequency.exponentialRampToValueAtTime(hi ? 1000 : 700, t + 0.05);
+      osc("triangle", hi ? 3000 : 2200, 0.02);
+    }
+  }
+}
+
+// ---------- Programador (lookahead; el tick corre en un Worker para no frenarse en segundo plano) ----------
+const worker = new Worker(URL.createObjectURL(new Blob(
+  ["let id=null;onmessage=e=>{if(e.data==='start'){clearInterval(id);id=setInterval(()=>postMessage('tick'),25)}else{clearInterval(id);id=null}}"],
+  { type: "text/javascript" })));
+let playing = false, nextTime = 0, beatIdx = 0, subIdx = 0, barCount = 0, startedAt = 0, wakeLock = null;
+const LOOKAHEAD = 0.12;
+
+function secondsPerPulse() { return 60 / cfg.bpm / cfg.subdiv; }
+worker.onmessage = () => {
+  if (!playing) return;
+  while (nextTime < ctx.currentTime + LOOKAHEAD) {
+    const acc = cfg.accents[beatIdx] ?? 1;
+    if (subIdx === 0) { if (acc > 0) playSound(nextTime, acc); scheduleVisual(beatIdx, nextTime); }
+    else if (acc > 0) playSound(nextTime, 0.5);
+    nextTime += secondsPerPulse();
+    if (++subIdx >= cfg.subdiv) {
+      subIdx = 0;
+      if (++beatIdx >= cfg.beats) { beatIdx = 0; onBarEnd(); }
+    }
+  }
+  if (cfg.tmOn) {
+    const left = cfg.tmMin * 60 - (ctx.currentTime - startedAt);
+    if (left <= 0) { stop(); setStatus("Temporizador terminado ✔"); return; }
+    setStatus(trainerText() + "Quedan " + fmt(left));
+  }
+};
+function onBarEnd() {
+  barCount++;
+  if (cfg.trOn && barCount % cfg.trBars === 0 && cfg.bpm < cfg.trMax) {
+    setBpm(Math.min(cfg.trMax, cfg.bpm + cfg.trStep));
+  }
+  if (!cfg.tmOn) setStatus(trainerText() + "Compás " + (barCount + 1));
+}
+function trainerText() { return cfg.trOn ? (cfg.bpm >= cfg.trMax ? "Tope alcanzado · " : "Entrenador activo · ") : ""; }
+function fmt(s) { s = Math.ceil(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+
+function scheduleVisual(i, t) {
+  const delay = Math.max(0, (t - ctx.currentTime) * 1000);
+  setTimeout(() => {
+    if (!playing) return;
+    document.querySelectorAll(".beat").forEach((b, k) => b.classList.toggle("now", k === i));
+    if (cfg.flash && (cfg.accents[i] ?? 1) > 0) {
+      document.body.animate([{ background: "var(--accent-soft)" }, { background: "var(--bg)" }], { duration: 150 });
+    }
+  }, delay);
+}
+
+async function start() {
+  audio();
+  playing = true; beatIdx = 0; subIdx = 0; barCount = 0;
+  nextTime = ctx.currentTime + 0.06; startedAt = ctx.currentTime;
+  worker.postMessage("start");
+  $("play").textContent = "■ Detener"; $("play").classList.add("on");
+  setStatus(trainerText() + (cfg.tmOn ? "Quedan " + fmt(cfg.tmMin * 60) : "Compás 1"));
+  try { wakeLock = await navigator.wakeLock?.request("screen"); } catch {}
+}
+function stop() {
+  playing = false; worker.postMessage("stop");
+  $("play").textContent = "▶ Iniciar"; $("play").classList.remove("on");
+  document.querySelectorAll(".beat").forEach((b) => b.classList.remove("now"));
+  setStatus("");
+  try { wakeLock?.release(); } catch {} wakeLock = null;
+}
+function setStatus(s) { $("status").textContent = s; }
+
+// ---------- Interfaz ----------
+const NAMES = [[40,"Grave"],[60,"Largo"],[66,"Larghetto"],[76,"Adagio"],[108,"Andante"],[120,"Moderato"],[156,"Allegro"],[176,"Vivace"],[200,"Presto"],[999,"Prestissimo"]];
+function setBpm(v) {
+  cfg.bpm = Math.max(MIN, Math.min(MAX, Math.round(v)));
+  $("bpm").textContent = cfg.bpm; $("bpmRange").value = cfg.bpm;
+  $("tempoName").textContent = NAMES.find(([lim]) => cfg.bpm < lim)[1];
+  save("metro.cfg", cfg);
+}
+function renderBeats() {
+  const acc = cfg.accents.slice(0, cfg.beats);
+  while (acc.length < cfg.beats) acc.push(1);
+  cfg.accents = acc;
+  $("beats").innerHTML = "";
+  acc.forEach((a, i) => {
+    const b = document.createElement("button");
+    b.className = "beat" + (a === 2 ? " acc" : a === 0 ? " mute" : "");
+    b.textContent = i + 1;
+    b.title = a === 2 ? "Acento" : a === 0 ? "Silencio" : "Normal";
+    b.onclick = () => { cfg.accents[i] = a === 2 ? 1 : a === 1 ? 0 : 2; save("metro.cfg", cfg); renderBeats(); };
+    $("beats").appendChild(b);
+  });
+}
+function defaultAccents(n, unit) {
+  const a = Array(n).fill(1); a[0] = 2;
+  if (unit === 8 && n % 3 === 0 && n > 3) for (let i = 3; i < n; i += 3) a[i] = 2; // 6/8, 9/8, 12/8
+  return a;
+}
+function applyCfgToUI() {
+  setBpm(cfg.bpm);
+  $("beatsN").value = cfg.beats; $("unitN").value = cfg.unit; $("subdiv").value = cfg.subdiv;
+  $("sound").value = cfg.sound; $("vol").value = cfg.vol; $("subVol").value = cfg.subVol; $("flash").checked = cfg.flash;
+  $("trOn").checked = cfg.trOn; $("trStep").value = cfg.trStep; $("trBars").value = cfg.trBars; $("trMax").value = cfg.trMax;
+  $("tmOn").checked = cfg.tmOn; $("tmMin").value = cfg.tmMin;
+  renderBeats();
+}
+
+for (let i = 1; i <= 12; i++) $("beatsN").add(new Option(i, i));
+$("bpmRange").oninput = (e) => setBpm(+e.target.value);
+document.querySelectorAll("[data-step]").forEach((b) => b.onclick = () => setBpm(cfg.bpm + +b.dataset.step));
+$("play").onclick = () => playing ? stop() : start();
+$("beatsN").onchange = $("unitN").onchange = () => {
+  cfg.beats = +$("beatsN").value; cfg.unit = +$("unitN").value;
+  cfg.accents = defaultAccents(cfg.beats, cfg.unit); beatIdx = 0; subIdx = 0;
+  save("metro.cfg", cfg); renderBeats();
+};
+$("subdiv").onchange = (e) => { cfg.subdiv = +e.target.value; subIdx = 0; save("metro.cfg", cfg); };
+$("sound").onchange = (e) => { cfg.sound = e.target.value; save("metro.cfg", cfg); test(); };
+$("test").onclick = test;
+function test() { audio(); playSound(ctx.currentTime + 0.02, 2); playSound(ctx.currentTime + 0.35, 1); }
+const bind = (id, key, prop = "value", num = true) => $(id).addEventListener("change", (e) => {
+  let v = e.target[prop]; if (num) v = +v; cfg[key] = v; save("metro.cfg", cfg);
+});
+bind("vol", "vol"); bind("subVol", "subVol"); $("vol").oninput = (e) => cfg.vol = +e.target.value; $("subVol").oninput = (e) => cfg.subVol = +e.target.value;
+bind("flash", "flash", "checked", false); bind("trOn", "trOn", "checked", false); bind("tmOn", "tmOn", "checked", false);
+bind("trStep", "trStep"); bind("trBars", "trBars"); bind("trMax", "trMax"); bind("tmMin", "tmMin");
+$("trOn").addEventListener("change", () => { barCount = 0; });
+
+// Tap tempo: promedio de los últimos toques; se reinicia si pasan más de 2 s
+let taps = [];
+$("tap").onclick = () => {
+  const now = performance.now();
+  if (taps.length && now - taps[taps.length - 1] > 2000) taps = [];
+  taps.push(now); if (taps.length > 6) taps.shift();
+  if (taps.length >= 2) {
+    const avg = (taps[taps.length - 1] - taps[0]) / (taps.length - 1);
+    setBpm(60000 / avg);
+    $("tap").textContent = "Tap tempo · " + cfg.bpm + " BPM";
+  } else $("tap").textContent = "Seguí tocando…";
+};
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (e.code === "Space") { e.preventDefault(); playing ? stop() : start(); }
+  else if (e.key === "ArrowUp" || e.key === "ArrowRight") setBpm(cfg.bpm + 1);
+  else if (e.key === "ArrowDown" || e.key === "ArrowLeft") setBpm(cfg.bpm - 1);
+  else if (e.key.toLowerCase() === "t") $("tap").click();
+});
+
+// ---------- Configuraciones guardadas ----------
+const PRESET_KEYS = ["bpm","beats","unit","accents","subdiv","sound","trOn","trStep","trBars","trMax","tmOn","tmMin"];
+function renderPresets() {
+  $("presets").innerHTML = "";
+  presets.forEach((p, i) => {
+    const li = document.createElement("li");
+    const s = document.createElement("span");
+    s.textContent = `${p.name} — ${p.bpm} BPM, ${p.beats}/${p.unit}`;
+    const load = document.createElement("button"); load.textContent = "Cargar";
+    load.onclick = () => { PRESET_KEYS.forEach((k) => { if (k in p) cfg[k] = Array.isArray(p[k]) ? p[k].slice() : p[k]; }); save("metro.cfg", cfg); applyCfgToUI(); };
+    const del = document.createElement("button"); del.textContent = "✕"; del.title = "Borrar";
+    del.onclick = () => { presets.splice(i, 1); save("metro.presets", presets); renderPresets(); };
+    li.append(s, load, del); $("presets").appendChild(li);
+  });
+}
+$("savePreset").onclick = () => {
+  const name = $("presetName").value.trim() || `Config. ${presets.length + 1}`;
+  const p = { name }; PRESET_KEYS.forEach((k) => p[k] = Array.isArray(cfg[k]) ? cfg[k].slice() : cfg[k]);
+  presets.push(p); save("metro.presets", presets); $("presetName").value = ""; renderPresets();
+};
+
+applyCfgToUI(); renderPresets();
+if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
