@@ -102,6 +102,31 @@ Método acordado con el usuario (comando `/reposicion`):
 - Una vez enviado, poner al mail de RC la etiqueta **Resuelto** (`Label_7027701249900588394`) para saber que ya se pasó.
 - 12/11/2026: enviado a Mariana el pedido de RC del 11/11 (`PEDIDO 11112026 PRH.xlsx`); mail de RC marcado Resuelto.
 
+## Pedidos de RC "PEDIDO A FACTURAR - <cliente>" (novedades, no saldos): modelo fijo
+
+- RC manda a mandrake.dis los datos del cliente (razón social, CUIT, IVA, dirección), **Total**, **Ejemplares**,
+  **Descuento** y vencimiento (normalmente CONTADO), con un Excel del pedido (los totales siempre coincidieron).
+- Criterio del usuario (16/11/2026): **emitir sin preguntar y mandar a RC**. Sucursal **DISTRIBUIDORA** (si :5/:6 están
+  en otras sucursales, abrir `:7` "Fierro (Claude 3)"; el usuario se loguea, puede hacerlo desde el celu con AnyDesk).
+- Ventas > Facturas de venta > ícono **FG** → Cliente (código + Tab) → **Punto de Venta "14 - Fac. Distribución
+  Mayorista"** (Fierro pone FC Electrónica) → Tipo **"Factura con leyenda"** → vencimiento = fecha (contado; lo pone
+  solo) → Importe total = Total del mail, IVA 0 → Descripción, una línea:
+  `Ejemplares: 8 - Descuento: 40 % - Total: $ 225.120,00` (modelo FG 14-00000455 Bardini).
+- Formas de Pago → ícono "Ingresar pago de cuenta corriente" → Aceptar → Aceptar de la factura. Avisos: ARCA "39:
+  IMPORTANTE…" (ventana aparte, Aceptar) → ticket de cambio **No** → "¿Desea imprimirla?" **Sí** (abre evince en :7
+  con `/tmp/tmpXXXX.pdf`; no se puede cerrar ni matar: bajarlo con `XLowerWindow` vía ctypes).
+- Las ventanas de diálogo no se ven en `shot` (sin gestor de ventanas): listarlas con xwininfo y usar `shotwin`.
+- PDF → `~/fierro-claude/facturas/rc/<Cliente> Factura 14-xxxxxxxx.pdf`. Envío: cargar en `RESPUESTAS` de
+  `rc_borradores.py` (id del mail de RC, PDF, texto "Ricardo:\nTe adjunto la factura FG 14-… de <cliente> por $ X.\n
+  Abrazo\nOsvaldo") y `python3 -I rc_borradores.py --enviar` (responde en el hilo por SMTP; `--probar` antes).
+- Cliente: buscar en Ventas > Clientes por CUIT (con guiones) y por nombre. Si no existe: ícono "Crear un nuevo
+  cliente" → Organización (CUIT 30-) o Persona, con cuenta corriente; nombre fantasía, razón social, IVA, CUIT,
+  contacto `RC`; domicilio, provincia, localidad, teléfono, mail; Condición Base; Tipo de cliente CLIENTE MAYORISTA;
+  grupo GPO.CLIENTES DISTRIBUIDORA. (Regla ARCA de abajo; el 16/11 el usuario autorizó crear sin verificar.)
+- 16/11/2026: FG 14-00000461 MATTIA (Mariano Alejandro Mattia, Exento) $225.120, 8 ej.; FG 14-00000462 Le Club
+  (cliente nuevo **17750**, LE CLUB de Osvaldo Osorio y Beatriz Leda, CUIT 30-64863692-6, Resp. inscripto, San Martín
+  950 Mendoza, **sin verificar en ARCA**) $278.400, 10 ej. Ambas contado, cta. cte., enviadas a RC.
+
 ## Facturas de venta de saldos (Planeta) a clientes de RC
 
 - RC = Ricardo (rcquilmes@hotmail.com), maneja el depósito de Quilmes. Manda remitos (`Remito_Saldos_<cliente>_<fecha>.xlsx`).
