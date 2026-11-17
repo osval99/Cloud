@@ -129,6 +129,8 @@ Método acordado con el usuario (comando `/reposicion`):
 - Cliente **Persona** (CUIT 20-/27-): el asistente no tiene nombre de fantasía ni contacto (la descripción queda
   "Nombre Apellido"). Pasos: Persona + Con cuenta corriente → nombre, apellido, DNI, IVA, CUIT → dirección → Condición
   Base → límites 0 → Tipo CLIENTE MAYORISTA → grupo GPO.CLIENTES DISTRIBUIDORA → Finish.
+- **Vendedor: OSVALDO** en todo cliente nuevo (paso "Datos de distribución"; botón "..." para elegirlo). Pedido del
+  usuario, 17/11/2026.
 - 17/11/2026: cliente nuevo **17767 KARLOVICH MAXIMILIANO ABEL** (Persona, CUIT 20-34139048-7, DNI 34139048, Resp.
   inscripto según constancia ARCA, Mompox 1710, CP 1134, C.A.B.A.), sin teléfono ni mail.
 
