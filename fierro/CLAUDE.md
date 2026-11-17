@@ -129,6 +129,8 @@ Método acordado con el usuario (comando `/reposicion`):
   **FG 14-00000460** al cliente nuevo **17691 PLANCK S.A.S.** (así figura en ARCA, con C; nombre fantasía AM Libros,
   CUIT 30-71920227-2, Resp. inscripto, Garibaldi 61 Mendoza, CTA CTE MAY, CLIENTE MAYORISTA), vto 13/12/2026.
   Al crear un cliente nuevo, Fierro le asigna código numérico (no se puede elegir).
+- 17/11/2026: FG 14-00000463 Karlovich (`17767`, MAXIMILIANO ABEL KARLOVICH, Resp. inscripto) 369 ej × **$3.500** =
+  $1.291.500, vto 17/12/2026. El remito no trae precio: si no está claro, preguntarlo (Malapalabra y Karlovich: $3.500).
 - **Antes de crear un cliente o proveedor, verificar en ARCA** (Constancia de inscripción,
   seti.afip.gob.ar/padron-puc-constancia-internet; pide CAPTCHA: lo resuelve el usuario en el navegador integrado)
   la razón social y la condición de IVA ("IVA" en impuestos registrados = Resp. inscripto; "IVA EXENTO" = Exento).
