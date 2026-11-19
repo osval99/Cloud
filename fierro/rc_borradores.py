@@ -31,10 +31,8 @@ RC_MAIL = "rcquilmes@hotmail.com"
 RESPUESTAS = [
     # Id None = mail nuevo (no respuesta), con el asunto del 4.º elemento; 5.º opcional = destinatario (por defecto RC,
     # y si es otro va con copia a RC). El 2.º elemento puede ser un PDF o una lista de PDFs.
-    (None, [Path.home() / "Documentos" / "Saldos PLaneta 05102026" / "Planck AM Libros Factura Saldos 14-00000460.pdf",
-            Path.home() / "Documentos" / "Saldos PLaneta 05102026" / "AM Libros Mignani Nota de Credito 14-00000021.pdf"],
-     "Ricardo:\nPerdón, la factura FG 14-00000459 de ayer salió a nombre de Adrian Mignani y AM Libros ahora factura como PLANCK S.A.S. (CUIT 30-71920227-2).\nTe adjunto la factura correcta, FG 14-00000460 a PLANCK S.A.S. por $ 1.170.000 (390 libros de saldo a $ 3.000, e-cheq 30/60/90 días), y la nota de crédito NC 14-00000021 que anula la 459.\nAbrazo\nOsvaldo\n",
-     "Factura saldos AM Libros (PLANCK S.A.S.) FG 14-00000460 y NC 14-00000021"),
+    ("1a1f35ebf535cefd", Path.home() / "fierro-claude" / "facturas" / "rc" / "Malapalabra Factura 14-00000464.pdf",
+     "Ricardo:\nTe adjunto la factura FG 14-00000464 de Malapalabra por $ 1.228.800,00.\nAbrazo\nOsvaldo\n"),
 ]
 
 
