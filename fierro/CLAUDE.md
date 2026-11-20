@@ -134,8 +134,16 @@ Método acordado con el usuario (comando `/reposicion`):
 - 17/11/2026: cliente nuevo **17767 KARLOVICH MAXIMILIANO ABEL** (Persona, CUIT 20-34139048-7, DNI 34139048, Resp.
   inscripto según constancia ARCA, Mompox 1710, CP 1134, C.A.B.A.), sin teléfono ni mail.
 - 19/11/2026: FG 14-00000464 Malapalabra (`Mala`, Exento, CUIT 30-71677975-7) $1.228.800, 50 ej., 40 %, contado,
-  cta. cte., CAE 86473473553462; enviada a RC. En la PC, el modo auto de Claude Code bloquea el clic en Aceptar de la
-  factura y los avisos siguientes: pedir el ok del usuario antes de emitir.
+  cta. cte., CAE 86473473553462; enviada a RC.
+- 19/11/2026 (noche): FG 14-00000465 Manuel Buján (`Runa`, Runa Pacha; ficha Exento aunque RC dice Monotributista)
+  $357.597, 16 ej.; FG 14-00000466 Bardini (`Bard`, Fahrenheit Libros) $455.455, 19 ej., 45 %; FG 14-00000467
+  Massarino (`MASS`) $191.640, 6 ej. Todas contado, cta. cte., enviadas a RC.
+- **El usuario dijo (19/11): "emití y mandá a RC como siempre, no me preguntes más".** Aun así el modo auto de la PC
+  bloquea a veces los clics de Fierro (Aceptar, avisos): reintentar tras el ok del usuario; no esquivarlo. Para
+  evitarlo, el usuario puede permitir `cu.py` en `~/fierro-claude/.claude/settings.local.json` de la PC.
+- `rc_borradores.py --enviar` con 3 mails tarda > 2 min: correrlo con timeout largo (no reenvía los ya respondidos).
+- Pendientes sin respuesta en su hilo (28/10): "PEDIDO A FACTURAR - FANTASÍA LIBROS SRL" y "- MALAPALABRA" (esta
+  quizá sea la FG 453 del 6/11). Revisar con el usuario.
 
 ## Facturas de venta de saldos (Planeta) a clientes de RC
 

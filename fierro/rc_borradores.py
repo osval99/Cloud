@@ -31,8 +31,12 @@ RC_MAIL = "rcquilmes@hotmail.com"
 RESPUESTAS = [
     # Id None = mail nuevo (no respuesta), con el asunto del 4.º elemento; 5.º opcional = destinatario (por defecto RC,
     # y si es otro va con copia a RC). El 2.º elemento puede ser un PDF o una lista de PDFs.
-    ("1a1f35ebf535cefd", Path.home() / "fierro-claude" / "facturas" / "rc" / "Malapalabra Factura 14-00000464.pdf",
-     "Ricardo:\nTe adjunto la factura FG 14-00000464 de Malapalabra por $ 1.228.800,00.\nAbrazo\nOsvaldo\n"),
+    ("1a1f611a4bab1cf6", Path.home() / "fierro-claude" / "facturas" / "rc" / "Manuel Bujan Factura 14-00000465.pdf",
+     "Ricardo:\nTe adjunto la factura FG 14-00000465 de Manuel Buján por $ 357.597,00.\nAbrazo\nOsvaldo\n"),
+    ("1a1f60f942d4ff81", Path.home() / "fierro-claude" / "facturas" / "rc" / "Bardini Factura 14-00000466.pdf",
+     "Ricardo:\nTe adjunto la factura FG 14-00000466 de Bardini Gabriel Oscar por $ 455.455,00.\nAbrazo\nOsvaldo\n"),
+    ("1a1f60de1ab35649", Path.home() / "fierro-claude" / "facturas" / "rc" / "Massarino Factura 14-00000467.pdf",
+     "Ricardo:\nTe adjunto la factura FG 14-00000467 de Sergio Marcelo Massarino por $ 191.640,00.\nAbrazo\nOsvaldo\n"),
 ]
 
 
