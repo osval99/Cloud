@@ -142,8 +142,10 @@ Método acordado con el usuario (comando `/reposicion`):
   bloquea a veces los clics de Fierro (Aceptar, avisos): reintentar tras el ok del usuario; no esquivarlo. Para
   evitarlo, el usuario puede permitir `cu.py` en `~/fierro-claude/.claude/settings.local.json` de la PC.
 - `rc_borradores.py --enviar` con 3 mails tarda > 2 min: correrlo con timeout largo (no reenvía los ya respondidos).
-- Pendientes sin respuesta en su hilo (28/10): "PEDIDO A FACTURAR - FANTASÍA LIBROS SRL" y "- MALAPALABRA" (esta
-  quizá sea la FG 453 del 6/11). Revisar con el usuario.
+- **Pedidos pendientes**: un mail de RC sin respuesta en su hilo puede estar ya facturado (a veces se mandó como
+  "Fwd: Factura C 0014-…" en otro hilo). Antes de facturar, buscar en Enviados a RC por el nombre del cliente.
+  Ej.: pedidos del 28/10 → FG 14-00000445 Malapalabra ($1.721.760) y FG 14-00000446 Fantasía Libros SRL ($495.318),
+  enviadas el 30/10.
 
 ## Facturas de venta de saldos (Planeta) a clientes de RC
 
