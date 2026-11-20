@@ -159,6 +159,7 @@ Método acordado con el usuario (comando `/reposicion`):
 - 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
   → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
 - 13/11/2026: FG 0028-46350, 46375, 46473 y NG 0032-5503, 0028-10240 (faltantes) en `Cargado DIS 13-11-2026.csv`.
+- 20/11/2026: NG 0028-10241 (13/11, $253.755,20, "Error de facturación", precio octubre de la FB 0028-46375) y NG 0032-5545 (18/11, $10.400, 8 ej., faltantes de la FB 0032-8667). Sin cargar: FG 0028-46505 (16/11, $1.022.150, 37 ej., remito 20-000186854).
 - **Resumen de cuenta y pago mensual**: Mariano Fucile (fucilemariano@yahoo.com.ar) manda cerca del día 13 "Resumen de cuenta
   Planeta" con dos PDF `Resumen<mm-aa>.PDF` (uno por cuenta; el de 1006187 dice "(DISTRIBUIDORA)"). Se paga el día 15.
   Verificar que todo lo del mes esté cargado (Facturas de compra y Créditos, PLA, sucursal DISTRIBUIDORA) y armar la OP:
