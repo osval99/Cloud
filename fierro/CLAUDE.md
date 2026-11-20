@@ -174,6 +174,8 @@ Método acordado con el usuario (comando `/reposicion`):
   **FG 14-00000460** al cliente nuevo **17691 PLANCK S.A.S.** (así figura en ARCA, con C; nombre fantasía AM Libros,
   CUIT 30-71920227-2, Resp. inscripto, Garibaldi 61 Mendoza, CTA CTE MAY, CLIENTE MAYORISTA), vto 13/12/2026.
   Al crear un cliente nuevo, Fierro le asigna código numérico (no se puede elegir).
+- 17/11/2026: FG 14-00000463 Karlovich (`17767`, MAXIMILIANO ABEL KARLOVICH, Resp. inscripto) 369 ej × **$3.500** =
+  $1.291.500, vto 17/12/2026. El remito no trae precio: si no está claro, preguntarlo (Malapalabra y Karlovich: $3.500).
 - **Antes de crear un cliente o proveedor, verificar en ARCA** (Constancia de inscripción,
   seti.afip.gob.ar/padron-puc-constancia-internet; pide CAPTCHA: lo resuelve el usuario en el navegador integrado)
   la razón social y la condición de IVA ("IVA" en impuestos registrados = Resp. inscripto; "IVA EXENTO" = Exento).
@@ -199,6 +201,7 @@ Método acordado con el usuario (comando `/reposicion`):
   `dd/mm/aaaa Nej. importe FB 0028-xxxxx`. Aceptar → Sí.
 - 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
   → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
+- 13/11/2026: FG 0028-46350, 46375, 46473 y NG 0032-5503, 0028-10240 (faltantes) en `Cargado DIS 13-11-2026.csv`.
 
 ## Facturas de Planeta (SINLI) en LIBRERIA
 
@@ -239,6 +242,8 @@ Método acordado con el usuario (comando `/reposicion`):
 - Importar renglones desde CSV (factura o remito): Ventana Activa > Importar documento desde CSV (formato Excel,
   línea 2, Cantidad col. 2, Código col. 1 ISBN, Precio col. 3, Descuento col. 4, separador decimal "."; CSV armado
   desde el PDF con `pdftotext`).
+- Pendiente (13/11/2026): FC B 00028-00046456 (12/11, $5.980.245, 286 ej.), declaración de ventas del PB 8684 (rotulada
+  "DV0926" igual que la 46099, pero es otra). Esperar el mensaje SINLI y cargarla en LIBRERIA.
 - 11/11/2026: FC B 00028-00046338 (05/11, $1.172.500, SINLI). Sin cargar 0028-46331 (remito 20-000186290) y
   0028-46382 (remito 20-000186584): remitos no ingresados.
 - 5/11/2026: FC B 00028-00046099 (13/10, $4.697.445,00, 242 ej.) y FC B 00028-00046234 (28/10, $2.274.600,00,
