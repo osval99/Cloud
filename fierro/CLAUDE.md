@@ -159,6 +159,14 @@ Método acordado con el usuario (comando `/reposicion`):
 - 4/11/2026: cargadas 23 FG (07/09 a 29/10, 0028-45692 … 0028-46258) y 10 NG (hasta 0032-5473, diferencia de precios
   → motivo "Error de facturación"), más FG 0032-8410 (16/07, saldos, $19.600.000, vto 1ª cuota 15/11). Detalle en `facturas/planeta/Cargado DIS 04-11-2026.xlsx`.
 - 13/11/2026: FG 0028-46350, 46375, 46473 y NG 0032-5503, 0028-10240 (faltantes) en `Cargado DIS 13-11-2026.csv`.
+- **Resumen de cuenta y pago mensual**: Mariano Fucile (fucilemariano@yahoo.com.ar) manda cerca del día 13 "Resumen de cuenta
+  Planeta" con dos PDF `Resumen<mm-aa>.PDF` (uno por cuenta; el de 1006187 dice "(DISTRIBUIDORA)"). Se paga el día 15.
+  Verificar que todo lo del mes esté cargado (Facturas de compra y Créditos, PLA, sucursal DISTRIBUIDORA) y armar la OP:
+  Compras > Órdenes de Pago/Recibos > ícono **OP**, proveedor `PLA` + **Enter** (Tab no lo toma). La lista de débitos trae
+  todas las sucursales; seleccionar una fila y **Agregar** (la siguiente queda seleccionada). Dejarla abierta si el usuario no da
+  la forma de pago.
+- 20/11/2026: faltaban FG 0028-45479, 45537, 45547, 45563 y NG 9920, 9943, 9980, 10001 (agosto) → cargadas
+  (`Cargado DIS 20-11-2026.csv`). OP 4949 (vto. noviembre, $6.472.000) armada y dejada abierta en `:8`.
 
 ## Facturas de Planeta (SINLI) en LIBRERIA
 
