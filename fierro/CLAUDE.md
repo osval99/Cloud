@@ -88,6 +88,8 @@ Método acordado con el usuario (comando `/reposicion`):
   **un dígito por vez** (con `type` de varios dígitos se pierden): borrar con Ctrl+A/BackSpace, Home, `0 0 0 1 6`;
   después **clic en el segundo tramo** y escribir `8 1 4 6 2`. Verificar con captura (Home y End).
 - Cargada así: FG B 00016-00081462 (24/08/2026, $877.939,70, 46 ej.) el 3/11/2026.
+- 20/11/2026 (resumen de cuenta de Camila Andrada): FG B 00016-00081809 ($965.827,50, 50 ej.), 00016-00082548
+  ($1.133.520,30, 54 ej.) y 00016-00082964 ($845.053,55, 39 ej.). Quilmes se ve en "Domicilio/Localidad" del PDF.
 
 ## Pedidos de RC para PRH (DISTRIBUIDORA): reenvío por mail
 
