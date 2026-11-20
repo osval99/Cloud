@@ -166,7 +166,8 @@ Método acordado con el usuario (comando `/reposicion`):
   todas las sucursales; seleccionar una fila y **Agregar** (la siguiente queda seleccionada). Dejarla abierta si el usuario no da
   la forma de pago.
 - 20/11/2026: faltaban FG 0028-45479, 45537, 45547, 45563 y NG 9920, 9943, 9980, 10001 (agosto) → cargadas
-  (`Cargado DIS 20-11-2026.csv`). OP 4949 (vto. noviembre, $6.472.000) armada y dejada abierta en `:8`.
+  (`Cargado DIS 20-11-2026.csv`). OP 4949 (vto. noviembre, $6.472.000) guardada **sin asignar pagos** (Fierro lo permite: estado
+  "Sin asignar pagos"). Cuando el usuario paga: Órdenes de pago/Recibos > buscar la OP > ícono **$** "Asignar la forma de pago a la Orden de Pago".
 
 ## Facturas de Planeta (SINLI) en LIBRERIA
 
