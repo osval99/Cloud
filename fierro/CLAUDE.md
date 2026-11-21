@@ -133,6 +133,11 @@ Método acordado con el usuario (comando `/reposicion`):
   Al crear un cliente nuevo, Fierro le asigna código numérico (no se puede elegir).
 - 17/11/2026: FG 14-00000463 Karlovich (`17767`, MAXIMILIANO ABEL KARLOVICH, Resp. inscripto) 369 ej × **$3.500** =
   $1.291.500, vto 17/12/2026. El remito no trae precio: si no está claro, preguntarlo (Malapalabra y Karlovich: $3.500).
+- 21/11/2026: FG 14-00000468 Bardini (`Bard`, Fahrenheit Libros, CUIT 20-17569391-3, sin mail) 345 ej × $3.000 =
+  $1.035.000, vto 21/12/2026, e-cheq 30/60/90. Vino como escaneo del remito Planeta 0027-00001389 (353 ej.) + nota de
+  faltante Interbook 144363 (−8: Jurame que nunca 5, Automatizados 3). Detalle sin precio con el formato de
+  `Remito_Saldos_<cliente><dd-mm-aa>.xlsx` (copiando el de Karlovich), mandado a RC junto con el PDF con
+  `rc_borradores.py --enviar` (mail nuevo; ahora adjunta también xlsx).
 - **Antes de crear un cliente o proveedor, verificar en ARCA** (Constancia de inscripción,
   seti.afip.gob.ar/padron-puc-constancia-internet; pide CAPTCHA: lo resuelve el usuario en el navegador integrado)
   la razón social y la condición de IVA ("IVA" en impuestos registrados = Resp. inscripto; "IVA EXENTO" = Exento).
