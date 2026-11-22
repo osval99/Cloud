@@ -1,5 +1,5 @@
 // App: primero la red (para tomar cambios). Librerías del CDN: primero la caché (tienen versión fija).
-const CACHE = "atril-v1";
+const CACHE = "atril-v2";
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 const LIBS = [
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",

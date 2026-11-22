@@ -31,7 +31,7 @@ Al terminar cada tarea, antes del commit final:
 | `escaner-fierro/` | PWA que escanea códigos de barra y los pasa a Fierro |
 | `fierro/` | Manejo del ERP Fierro por pantalla (`cu.py`, reposición, facturas de compra); se usa desde `~/fierro-claude/` (enlaces) |
 | `finanzas/` | Estrategia de manejo de liquidez en pesos |
-| `lector-partituras/` | PWA "Atril": lector de partituras (PDF, imágenes, MusicXML) con setlists, anotaciones y metrónomo |
+| `lector-partituras/` | PWA "Atril": lector de partituras (PDF, imágenes, MusicXML con reproducción) con setlists, anotaciones y metrónomo |
 | `mantenimiento-pc/` | Datos y tareas de mantenimiento de la PC (Windows 10) |
 | `metronomo/` | PWA de metrónomo (compás, acentos, subdivisiones, tap tempo, entrenador, presets) |
 | `pomodoro/` | PWA de temporizador pomodoro configurable (duraciones, ciclos, sonido, historial del día) |

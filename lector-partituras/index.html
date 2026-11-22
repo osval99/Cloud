@@ -126,6 +126,9 @@ button { cursor: pointer; }
 #mdot { width: 16px; height: 16px; border-radius: 50%; background: #3a4052; transition: background .08s; }
 #mdot.on { background: #8c98ff; } #mdot.acc { background: #ffcf5c; }
 #mbeats { background: #2a2f3e; border: 1px solid #3a4052; border-radius: 8px; padding: 6px; color: #e9ebf1; }
+.mark { position: absolute; background: rgba(52,70,196,.22); border-left: 3px solid #3446c4; border-radius: 3px; pointer-events: none; }
+#pRate { width: 130px; accent-color: #8c98ff; }
+#pRateL { font-variant-numeric: tabular-nums; font-size: 13px; min-width: 92px; text-align: center; color: #c9cdd8; }
 @media (prefers-reduced-motion: reduce) { #pchip, #mdot { transition: none; } }
 </style>
 </head>
@@ -174,6 +177,7 @@ button { cursor: pointer; }
     <button class="vbtn" id="vFit" aria-pressed="false" title="Ajuste">Página</button>
     <button class="vbtn" id="vDual" aria-pressed="true" title="Dos páginas con el celular horizontal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="8" height="14" rx="1"/><rect x="13" y="5" width="8" height="14" rx="1"/></svg></button>
     <button class="vbtn" id="vDraw" aria-pressed="false" aria-label="Anotar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></button>
+    <button class="vbtn" id="vPlay" aria-pressed="false" aria-label="Escuchar" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button>
     <button class="vbtn" id="vMetro" aria-pressed="false" aria-label="Metrónomo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6l4 18H5z"/><path d="M12 16l5-9"/></svg></button>
   </div>
 
@@ -191,6 +195,15 @@ button { cursor: pointer; }
     <button class="vbtn" id="dUndo" aria-label="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
     <button class="vbtn" id="dClear">Borrar pág.</button>
     <button class="vbtn" id="dDone" style="color:#b8c0ff;font-weight:600">Listo</button>
+  </div>
+
+  <div id="player" class="panel" hidden>
+    <button class="vbtn" id="pStart" aria-label="Volver al principio"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="3" height="14"/><path d="M20 5v14L9 12z"/></svg></button>
+    <button class="vbtn" id="pToggle" aria-label="Reproducir" style="background:#2f3550"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg></button>
+    <button class="vbtn" id="pStop" aria-label="Detener"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg></button>
+    <span class="sep"></span>
+    <input id="pRate" type="range" min="25" max="200" step="5" value="100" aria-label="Velocidad">
+    <span id="pRateL">100 %</span>
   </div>
 
   <div id="metro" class="panel" hidden>
@@ -353,14 +366,47 @@ async function xmlDoc(blob, name) {
     osmd.render();
     const svgs = [...host.querySelectorAll('svg')];
     if (!svgs.length) throw new Error('La partitura no tiene contenido para mostrar');
+    const events = musicEvents(osmd, svgs);
     const imgs = await Promise.all(svgs.map((svg) => {
       const r = svg.getBoundingClientRect();
       svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       svg.setAttribute('width', Math.round(r.width)); svg.setAttribute('height', Math.round(r.height));
       return loadImage(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' }));
     }));
-    return imagesDoc(imgs);
+    const doc = imagesDoc(imgs); doc.events = events; return doc;
   } finally { host.remove(); }
+}
+// Recorre la partitura con el cursor de OSMD: notas (frecuencia, duración), tiempo en segundos y posición en la página.
+function musicEvents(osmd, svgs) {
+  const ev = [];
+  try {
+    const rects = svgs.map((s) => s.getBoundingClientRect());
+    const c = osmd.cursor; c.show(); c.reset();
+    let sec = 0, prevT = null, prevBpm = 120, prevMin = 0.25, guard = 0;
+    while (!c.Iterator.EndReached && guard++ < 50000) {
+      const it = c.Iterator, t = it.currentTimeStamp.RealValue;
+      const bpm = (it.CurrentMeasure && it.CurrentMeasure.TempoInBPM) || prevBpm || 120;
+      if (prevT !== null) { let d = t - prevT; if (d <= 0) d = prevMin; sec += d * 240 / prevBpm; }
+      const notes = []; let min = Infinity;
+      for (const n of c.NotesUnderCursor()) {
+        const len = n.Length ? n.Length.RealValue : 0.25;
+        if (len > 0) min = Math.min(min, len);
+        if (n.isRest() || !n.Pitch) continue;
+        const tie = n.NoteTie;
+        if (tie && tie.StartNote && tie.StartNote !== n) continue;
+        const total = tie && tie.Notes ? tie.Notes.reduce((a, x) => a + x.Length.RealValue, 0) : len;
+        notes.push([n.Pitch.Frequency, Math.max(0.06, total * 240 / bpm)]);
+      }
+      const r = c.cursorElement.getBoundingClientRect();
+      let p = rects.findIndex((q) => r.top + r.height / 2 >= q.top && r.top + r.height / 2 <= q.bottom); if (p < 0) p = 0;
+      const q = rects[p];
+      ev.push({ s: sec, n: notes, p, x: (r.left - q.left) / q.width, y: (r.top - q.top) / q.height, w: Math.max(r.width, 8) / q.width, h: r.height / q.height, bpm });
+      prevT = t; prevBpm = bpm; prevMin = isFinite(min) ? min : prevMin;
+      c.next();
+    }
+    c.hide();
+  } catch (e) { console.warn('No se pudieron leer las notas', e); }
+  return ev;
 }
 async function loadDoc(meta) {
   const f = await Store.get('files', meta.id);
@@ -549,6 +595,7 @@ async function openViewer(id, opts = {}) {
   if (!V.meta) { try { history.pushState({ atril: 1 }, ''); } catch {} }
   $('#viewer').hidden = false; $('#lib').setAttribute('aria-hidden', 'true');
   if (V.doc) { V.doc.destroy && V.doc.destroy(); }
+  playStop(); $('#player').hidden = true; $('#vPlay').setAttribute('aria-pressed', 'false'); $('#vPlay').hidden = true;
   V.meta = meta; V.doc = null; V.set = opts.set || null; V.cache.clear(); V.anns.clear(); V.undo = [];
   spread.replaceChildren(); setDraw(false);
   if (!opts.set || opts.page === 0 && !opts.auto) $('#viewer').classList.add('chrome');
@@ -562,7 +609,7 @@ async function openViewer(id, opts = {}) {
   const start = opts.page === 'last' ? lastStart() : opts.page ?? meta.last ?? 0;
   V.page = clamp(start, 0, V.doc.pages - 1);
   saveDoc(meta);
-  metroLoad();
+  metroLoad(); playerLoad();
   await show();
   wakeLock();
 }
@@ -570,7 +617,7 @@ function lastStart() { const n = V.doc.pages; return twoUp() ? Math.max(0, n - 2
 function showMsg(t) { const m = $('#vmsg'); m.hidden = !t; m.textContent = t || ''; m.style.whiteSpace = 'pre-line'; }
 function closeViewer() {
   if (!V.meta) return;
-  metroStop(); setDraw(false); $('#metro').hidden = true; $('#vMetro').setAttribute('aria-pressed', 'false');
+  metroStop(); playStop(); $('#player').hidden = true; setDraw(false); $('#metro').hidden = true; $('#vMetro').setAttribute('aria-pressed', 'false');
   if (V.doc && V.doc.destroy) V.doc.destroy();
   V.meta = null; V.doc = null; V.cache.clear(); spread.replaceChildren();
   $('#viewer').hidden = true; $('#lib').removeAttribute('aria-hidden');
@@ -630,7 +677,7 @@ async function show() {
   spread.replaceChildren(...pages);
   stage.classList.toggle('scrolls', spread.scrollHeight > stage.clientHeight + 1);
   stage.scrollTop = V.toEnd ? stage.scrollHeight : 0; V.toEnd = false;
-  updateChrome(); chip();
+  updateChrome(); chip(); placeMark();
   if (V.meta.last !== V.page) { V.meta.last = V.page; saveDoc(V.meta); }
   // precargar la siguiente página
   const nx = V.page + step();
@@ -679,7 +726,7 @@ stage.addEventListener('click', (e) => {
   if (V.draw || !V.doc) return;
   const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
   const v = $('#viewer');
-  if (x < 0.35 || x > 0.65) { if ($('#metro').hidden) v.classList.remove('chrome'); x < 0.35 ? prev() : next(); }
+  if (x < 0.35 || x > 0.65) { if ($('#metro').hidden && $('#player').hidden) v.classList.remove('chrome'); x < 0.35 ? prev() : next(); }
   else v.classList.toggle('chrome');
 });
 $('#vmsg').addEventListener('click', () => $('#viewer').classList.add('chrome'));
@@ -747,6 +794,7 @@ function attachDraw(ov, wrap) {
 function saveAnns(i) { const s = V.anns.get(i) || []; const k = `${V.meta.id}:${i}`; return s.length ? Store.put('anns', k, s) : Store.del('anns', k); }
 function redrawPage(i) { const w = [...spread.children].find((x) => x._i === i); if (w) drawStrokes(w.querySelector('.ov'), w._b, V.anns.get(i) || []); }
 function setDraw(on) {
+  if (on) { $('#player').hidden = true; $('#vPlay').setAttribute('aria-pressed', 'false'); }
   V.draw = on; $('#viewer').classList.toggle('drawing', on); $('#drawbar').hidden = !on; $('#vDraw').setAttribute('aria-pressed', on);
   if (on) { $('#metro').hidden = true; $('#vMetro').setAttribute('aria-pressed', 'false'); stage.style.overflowY = CFG.fit === 'width' ? 'auto' : 'hidden'; } else stage.style.overflowY = '';
   document.querySelectorAll('#drawbar [data-pen]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.pen === CFG.pen));
@@ -787,11 +835,10 @@ function metroTick() {
   }
 }
 function metroStart() {
-  try { M.ctx ||= new (window.AudioContext || window.webkitAudioContext)(); } catch { return vtoast('Este navegador no permite sonido'); }
-  M.ctx.resume(); M.on = true; M.beat = 0; M.next = M.ctx.currentTime + 0.06; clearInterval(M.timer); M.timer = setInterval(metroTick, 25); metroTick(); metroUI();
+  if (!audio()) return vtoast('Este navegador no permite sonido'); M.on = true; M.beat = 0; M.next = M.ctx.currentTime + 0.06; clearInterval(M.timer); M.timer = setInterval(metroTick, 25); metroTick(); metroUI();
 }
 function metroStop() { M.on = false; clearInterval(M.timer); metroUI(); }
-$('#vMetro').onclick = () => { const p = $('#metro'); p.hidden = !p.hidden; $('#vMetro').setAttribute('aria-pressed', !p.hidden); if (!p.hidden) setDraw(false); };
+$('#vMetro').onclick = () => { const p = $('#metro'); p.hidden = !p.hidden; $('#vMetro').setAttribute('aria-pressed', !p.hidden); if (!p.hidden) { setDraw(false); $('#player').hidden = true; $('#vPlay').setAttribute('aria-pressed', 'false'); } };
 $('#mPlay').onclick = () => (M.on ? metroStop() : metroStart());
 $('#mMinus').onclick = () => setBpm(M.bpm - 1); $('#mPlus').onclick = () => setBpm(M.bpm + 1);
 $('#mbpmR').oninput = (e) => setBpm(+e.target.value);
@@ -802,7 +849,96 @@ $('#mTap').onclick = () => {
   if (M.taps.length > 6) M.taps.shift();
 };
 // los paneles no deben pasar de página al tocarlos
-['#drawbar', '#metro', '#vtop', '#vbot'].forEach((s) => $(s).addEventListener('click', (e) => e.stopPropagation()));
+['#drawbar', '#metro', '#player', '#vtop', '#vbot'].forEach((s) => $(s).addEventListener('click', (e) => e.stopPropagation()));
+
+// ---------- reproducción (MusicXML) ----------
+function audio() {
+  try { M.ctx ||= new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; }
+  if (!M.out) { const comp = M.ctx.createDynamicsCompressor(); comp.connect(M.ctx.destination); M.out = M.ctx.createGain(); M.out.gain.value = 0.8; M.out.connect(comp); }
+  M.ctx.resume(); return M.ctx;
+}
+const P = { on: false, idx: 0, base: 0, rate: 1, timer: null, mark: null, timers: [] };
+function piano(t, f, dur) {
+  const c = M.ctx, g = c.createGain(), o1 = c.createOscillator(), o2 = c.createOscillator(), g2 = c.createGain();
+  o1.type = 'triangle'; o1.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = 0.35;
+  const len = Math.min(dur, 2.5), end = t + len + 0.25, peak = f > 1000 ? 0.12 : 0.2;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(peak * 0.35, t + Math.min(0.35, len)); g.gain.setValueAtTime(peak * 0.3, t + len);
+  g.gain.exponentialRampToValueAtTime(0.0001, end);
+  o1.connect(g); o2.connect(g2).connect(g); g.connect(M.out);
+  o1.start(t); o2.start(t); o1.stop(end + 0.05); o2.stop(end + 0.05);
+}
+function playerLoad() {
+  const has = !!(V.doc && V.doc.events && V.doc.events.length);
+  $('#vPlay').hidden = !has; P.idx = 0; P.mark = null;
+  P.rate = (V.meta.rate || 100) / 100; playerUI();
+}
+function playerUI() {
+  $('#pToggle').innerHTML = P.on ? '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>' : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
+  $('#pToggle').setAttribute('aria-label', P.on ? 'Pausa' : 'Reproducir');
+  const pct = Math.round(P.rate * 100), ev = V.doc && V.doc.events && V.doc.events[Math.min(P.idx, V.doc.events.length - 1)];
+  $('#pRate').value = pct; $('#pRateL').textContent = `${pct} %` + (ev ? ` · ♩=${Math.round(ev.bpm * P.rate)}` : '');
+}
+function playTick() {
+  const evs = V.doc.events, c = M.ctx;
+  while (P.idx < evs.length) {
+    const e = evs[P.idx], t = P.base + e.s / P.rate;
+    if (t > c.currentTime + 0.15) break;
+    if (t >= c.currentTime - 0.05) for (const [f, d] of e.n) piano(t, f, d / P.rate);
+    const i = P.idx;
+    P.timers.push(setTimeout(() => { if (P.on) { P.mark = evs[i]; placeMark(true); } }, Math.max(0, (t - c.currentTime) * 1000)));
+    if (P.timers.length > 64) P.timers.splice(0, 32);
+    P.idx++;
+  }
+  if (P.idx >= evs.length) {
+    const last = evs[evs.length - 1], endT = P.base + last.s / P.rate + Math.max(0, ...last.n.map((x) => x[1] / P.rate), 0.5);
+    if (c.currentTime > endT) { playStop(); P.idx = 0; vtoast('Fin de la partitura'); }
+  }
+}
+function playStart() {
+  const evs = V.doc && V.doc.events; if (!evs || !evs.length) return;
+  if (!audio()) return vtoast('Este navegador no permite sonido');
+  if (P.idx >= evs.length) P.idx = 0;
+  if (!P.started) { // primera vez: desde la página que se está viendo
+    const i = evs.findIndex((e) => e.p >= V.page); P.idx = i < 0 ? 0 : i; P.started = true;
+  }
+  P.base = M.ctx.currentTime + 0.1 - evs[P.idx].s / P.rate;
+  P.on = true; clearInterval(P.timer); P.timer = setInterval(playTick, 25); playTick(); playerUI();
+  try { if (!V.wake) wakeLock(); } catch {}
+}
+function playPause() {
+  P.on = false; clearInterval(P.timer); P.timers.forEach(clearTimeout); P.timers = [];
+  if (P.mark && V.doc && V.doc.events) P.idx = Math.max(0, V.doc.events.indexOf(P.mark));
+  if (M.out) { const old = M.out; old.gain.setTargetAtTime(0, M.ctx.currentTime, 0.03); M.out = null; setTimeout(() => old.disconnect(), 400); audio(); }
+  playerUI();
+}
+function playStop() { if (P.on) playPause(); P.idx = 0; P.started = false; P.mark = null; placeMark(); playerUI(); }
+function placeMark(follow) {
+  document.querySelectorAll('.mark').forEach((m) => m.remove());
+  const e = P.mark; if (!e || !V.doc) return;
+  const wrap = [...spread.children].find((w) => w._i === e.p);
+  if (!wrap) { if (follow) { V.page = twoUp() ? e.p - (e.p % 2) : e.p; show(); } return; }
+  const b = wrap._b, m = h('div', { class: 'mark' });
+  m.style.cssText = `left:${(e.x * b.cw) - 4}px;top:${e.y * b.ch}px;width:${Math.max(e.w * b.cw + 8, 14)}px;height:${e.h * b.ch}px`;
+  wrap.append(m);
+  if (follow && stage.scrollHeight > stage.clientHeight + 4) {
+    const r = m.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+    if (r.top < sr.top + 40 || r.bottom > sr.bottom - 40) stage.scrollTo({ top: stage.scrollTop + r.top - sr.top - sr.height / 3, behavior: 'smooth' });
+  }
+}
+$('#vPlay').onclick = () => {
+  const p = $('#player'); p.hidden = !p.hidden; $('#vPlay').setAttribute('aria-pressed', !p.hidden);
+  if (!p.hidden) { setDraw(false); $('#player').hidden = false; $('#vPlay').setAttribute('aria-pressed', 'true'); $('#metro').hidden = true; $('#vMetro').setAttribute('aria-pressed', 'false'); }
+};
+$('#pToggle').onclick = () => (P.on ? playPause() : playStart());
+$('#pStop').onclick = () => playStop();
+$('#pStart').onclick = () => { const was = P.on; if (was) playPause(); P.idx = 0; P.started = true; P.mark = V.doc.events[0]; placeMark(true); if (was) playStart(); };
+let rateT;
+$('#pRate').oninput = (e) => {
+  const v = +e.target.value / 100, was = P.on; if (was) playPause();
+  P.rate = v; playerUI(); if (was) playStart();
+  clearTimeout(rateT); rateT = setTimeout(() => { V.meta.rate = Math.round(P.rate * 100); saveDoc(V.meta); }, 400);
+};
 
 // ---------- arranque ----------
 $('#tabLib').onclick = () => { S.tab = 'lib'; renderLib(); };
