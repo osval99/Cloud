@@ -35,5 +35,5 @@ HTML + JS puro, sin dependencias ni build (misma estructura que `metronomo/` y `
   https://osval99.github.io/Cloud/afinador/ — se actualiza solo al mergear a `add-readme`.
   La URL no se pudo abrir desde la sesión en la nube (red bloqueada); confirmar en el celu.
 - Netlify descartado: el usuario no pudo crear cuenta.
-- Al cambiar archivos, subir la versión de caché en `sw.js` (`afinador-v1` → v2…).
+- Al cambiar archivos, subir la versión de caché en `sw.js` (ahora `afinador-v2`).
 - PC sin internet: `python -m http.server 8000` DENTRO de `afinador` y abrir http://localhost:8000.
