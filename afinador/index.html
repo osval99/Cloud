@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Afinador</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<meta name="theme-color" content="#14171C">
+<style>
+:root{
+  --bg:#F4F5F7; --card:#FFFFFF; --ink:#14171C; --muted:#5F6773; --line:#D9DDE3;
+  --ok:#14A44D; --warn:#D9822B; --bad:#D64545; --accent:#2E6FD9; --needle:#14171C;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171C; --card:#1D2128; --ink:#F2F4F7; --muted:#99A1AD; --line:#323843;
+    --ok:#3DDC84; --warn:#F0A04B; --bad:#F06060; --accent:#6EA2FF; --needle:#F2F4F7;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171C; --card:#1D2128; --ink:#F2F4F7; --muted:#99A1AD; --line:#323843;
+  --ok:#3DDC84; --warn:#F0A04B; --bad:#F06060; --accent:#6EA2FF; --needle:#F2F4F7;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+main{max-width:520px;margin:0 auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+h1{font-size:20px;margin:0;font-weight:650}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;padding:7px 12px;border-radius:7px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+#gauge{width:100%;height:auto;display:block}
+.readout{text-align:center;margin-top:-8px}
+#note{font-size:72px;font-weight:700;line-height:1;letter-spacing:-1px;transition:color .15s}
+#note sub{font-size:28px;font-weight:600;color:var(--muted);vertical-align:baseline;margin-left:2px}
+#cents{font-size:22px;font-variant-numeric:tabular-nums;margin-top:6px;font-weight:600}
+#freq{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:4px}
+#hint{min-height:22px;margin-top:8px;font-size:16px;color:var(--muted)}
+.ok{color:var(--ok)!important}.warn{color:var(--warn)!important}.bad{color:var(--bad)!important}
+#strings{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:14px}
+#strings button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px 0 8px;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s,background .15s}
+#strings button b{font-size:18px}
+#strings button small{font-size:11px;color:var(--muted)}
+#strings button.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+#strings button.done{border-color:var(--ok)}
+#strings button.done small::after{content:" ✓";color:var(--ok)}
+#strings button.playing{background:var(--accent);color:#fff}
+#strings button.playing small{color:#fff}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;font:inherit;font-size:15px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+#start{width:100%;padding:16px;font-size:18px;margin-top:14px}
+.set{display:flex;align-items:center;gap:10px;font-size:15px}
+.set input[type=range]{width:140px}
+.small{font-size:13px;color:var(--muted);line-height:1.4;margin-top:14px}
+#msg{color:var(--bad);font-size:14px;margin-top:10px;min-height:0}
+#level{height:4px;background:var(--line);border-radius:2px;margin-top:12px;overflow:hidden}
+#level i{display:block;height:100%;width:0;background:var(--accent);transition:width .08s}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Afinador</h1>
+    <div class="seg" role="group" aria-label="Modo">
+      <button id="mGuit" aria-pressed="true">Guitarra</button>
+      <button id="mChrom" aria-pressed="false">Cromático</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <svg id="gauge" viewBox="0 0 300 170" aria-hidden="true">
+      <g id="ticks"></g>
+      <path id="okzone" fill="none" stroke-width="10" stroke-linecap="butt"/>
+      <g id="needleG" transform="rotate(0 150 150)">
+        <line x1="150" y1="150" x2="150" y2="28" stroke="var(--needle)" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <circle cx="150" cy="150" r="8" fill="var(--needle)"/>
+    </svg>
+    <div class="readout">
+      <div id="note">–</div>
+      <div id="cents">&nbsp;</div>
+      <div id="freq">&nbsp;</div>
+      <div id="hint">Tocá el botón para empezar</div>
+    </div>
+    <div id="level"><i></i></div>
+    <div id="strings"></div>
+    <button id="start" class="btn primary">Activar micrófono</button>
+    <div id="msg"></div>
+  </section>
+
+  <div class="row">
+    <label class="set">La&nbsp;=&nbsp;<input id="a4" type="range" min="430" max="450" step="1" value="440"><b id="a4v">440</b>&nbsp;Hz</label>
+    <div class="seg" role="group" aria-label="Nombres">
+      <button id="nLat" aria-pressed="true">Do Re Mi</button>
+      <button id="nEng" aria-pressed="false">C D E</button>
+    </div>
+  </div>
+  <div class="row">
+    <button id="refBtn" class="btn">🔊 Tocar nota</button>
+    <span class="small" style="margin:0" id="refInfo">Tocá una cuerda de abajo para oír su nota.</span>
+  </div>
+  <p class="small">Tocá una cuerda sola y dejala sonar. Verde = afinado (±2 cents). En modo Guitarra detecta sola la cuerda más cercana (E A D G B E). Funciona mejor sin ruido de fondo y con el celu cerca de la boca de la guitarra.</p>
+</main>
+
+<script>
+/*DETECT-START*/
+// Detección de altura: algoritmo YIN (de Cheveigné & Kawahara, 2002) con interpolación parabólica.
+function detectPitch(buf, sr, minF, maxF, threshold) {
+  threshold = threshold || 0.12;
+  const n = buf.length;
+  const tauMin = Math.max(2, Math.floor(sr / maxF));
+  const tauMax = Math.min(Math.ceil(sr / minF), Math.floor(n / 2));
+  const W = n - tauMax - 1;
+  if (W < tauMax) return null;
+  // quitar componente continua
+  let mean = 0; for (let i = 0; i < n; i++) mean += buf[i]; mean /= n;
+  const x = new Float32Array(n); for (let i = 0; i < n; i++) x[i] = buf[i] - mean;
+  const d = new Float32Array(tauMax + 2);
+  for (let tau = 1; tau <= tauMax + 1; tau++) {
+    let s = 0;
+    for (let j = 0; j < W; j++) { const v = x[j] - x[j + tau]; s += v * v; }
+    d[tau] = s;
+  }
+  // diferencia normalizada acumulada
+  const c = new Float32Array(tauMax + 2); c[0] = 1;
+  let run = 0;
+  for (let tau = 1; tau <= tauMax + 1; tau++) { run += d[tau]; c[tau] = run > 0 ? d[tau] * tau / run : 1; }
+  let tau = -1;
+  for (let t = tauMin; t <= tauMax; t++) {
+    if (c[t] < threshold) { while (t + 1 <= tauMax && c[t + 1] < c[t]) t++; tau = t; break; }
+  }
+  if (tau < 0) { // sin mínimo claro: tomar el global si es razonable
+    let best = tauMin;
+    for (let t = tauMin; t <= tauMax; t++) if (c[t] < c[best]) best = t;
+    if (c[best] > 0.3) return null;
+    tau = best;
+  }
+  // interpolación parabólica sobre d
+  let better = tau;
+  if (tau > 1 && tau < tauMax + 1) {
+    const a = d[tau - 1], b = d[tau], e = d[tau + 1], den = a + e - 2 * b;
+    if (den > 0) better = tau + (a - e) / (2 * den);
+  }
+  return { freq: sr / better, clarity: 1 - c[tau] };
+}
+/*DETECT-END*/
+
+const LAT = ["Do","Do#","Re","Re#","Mi","Fa","Fa#","Sol","Sol#","La","La#","Si"];
+const ENG = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const GUITAR = [ // MIDI de cuerdas al aire, afinación estándar
+  { n: 6, midi: 40 }, { n: 5, midi: 45 }, { n: 4, midi: 50 },
+  { n: 3, midi: 55 }, { n: 2, midi: 59 }, { n: 1, midi: 64 }
+];
+const IN_TUNE = 2;      // cents
+const $ = (id) => document.getElementById(id);
+
+let cfg = { mode: "guitar", a4: 440, names: "lat" };
+try { Object.assign(cfg, JSON.parse(localStorage.getItem("afin.cfg") || "{}")); } catch {}
+const save = () => { try { localStorage.setItem("afin.cfg", JSON.stringify(cfg)); } catch {} };
+
+const midiToFreq = (m) => cfg.a4 * Math.pow(2, (m - 69) / 12);
+const freqToMidi = (f) => 69 + 12 * Math.log2(f / cfg.a4);
+const nameOf = (m) => (cfg.names === "lat" ? LAT : ENG)[((m % 12) + 12) % 12];
+const octOf = (m) => Math.floor(m / 12) - 1;
+
+// ---------- Indicador ----------
+function arcPath(r, a0, a1) { // ángulos en grados, 0 = arriba
+  const p = (a) => [150 + r * Math.sin(a * Math.PI / 180), 150 - r * Math.cos(a * Math.PI / 180)];
+  const [x0, y0] = p(a0), [x1, y1] = p(a1);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+const MAXDEG = 70; // ±50 cents → ±70°
+(function drawTicks() {
+  let s = "";
+  for (let c = -50; c <= 50; c += 5) {
+    const a = c / 50 * MAXDEG, big = c % 25 === 0;
+    const r1 = 128, r2 = big ? 112 : 120;
+    const sx = 150 + r1 * Math.sin(a * Math.PI / 180), sy = 150 - r1 * Math.cos(a * Math.PI / 180);
+    const ex = 150 + r2 * Math.sin(a * Math.PI / 180), ey = 150 - r2 * Math.cos(a * Math.PI / 180);
+    s += `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="var(--muted)" stroke-width="${big ? 2.5 : 1.5}"/>`;
+    if (big) {
+      const tx = 150 + 98 * Math.sin(a * Math.PI / 180), ty = 150 - 98 * Math.cos(a * Math.PI / 180) + 4;
+      s += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" font-size="11" text-anchor="middle" fill="var(--muted)">${c > 0 ? "+" + c : c}</text>`;
+    }
+  }
+  $("ticks").innerHTML = s;
+  const z = IN_TUNE / 50 * MAXDEG + 1;
+  $("okzone").setAttribute("d", arcPath(134, -z, z));
+  $("okzone").setAttribute("stroke", "var(--ok)");
+})();
+
+let needleCents = 0, needleTarget = 0;
+function animNeedle() {
+  needleCents += (needleTarget - needleCents) * 0.25;
+  const deg = Math.max(-1, Math.min(1, needleCents / 50)) * MAXDEG;
+  $("needleG").setAttribute("transform", `rotate(${deg.toFixed(2)} 150 150)`);
+  requestAnimationFrame(animNeedle);
+}
+requestAnimationFrame(animNeedle);
+
+// ---------- Cuerdas ----------
+const done = new Set();
+function buildStrings() {
+  const box = $("strings");
+  box.style.display = cfg.mode === "guitar" ? "grid" : "none";
+  box.innerHTML = "";
+  for (const s of GUITAR) {
+    const b = document.createElement("button");
+    b.dataset.midi = s.midi;
+    b.innerHTML = `<b>${nameOf(s.midi)}</b><small>${s.n}ª</small>`;
+    b.title = `Cuerda ${s.n}: ${nameOf(s.midi)}${octOf(s.midi)} — tocar para oír la nota`;
+    if (done.has(s.midi)) b.classList.add("done");
+    b.onclick = () => playRef(s.midi, b);
+    box.appendChild(b);
+  }
+  $("refInfo").textContent = cfg.mode === "guitar"
+    ? "Tocá una cuerda de arriba para oír su nota."
+    : "Repite la última nota detectada.";
+  $("refBtn").style.display = cfg.mode === "guitar" ? "none" : "";
+}
+
+// ---------- Audio ----------
+let ctx = null, analyser = null, stream = null, buf = null, wakeLock = null;
+let running = false, refUntil = 0, lastDetect = 0;
+let hist = [], lastMidi = null, lastHeard = 0, tunedSince = 0, curTarget = null;
+
+async function start() {
+  $("msg").textContent = "";
+  if (!navigator.mediaDevices?.getUserMedia) {
+    $("msg").textContent = "Este navegador no permite usar el micrófono (hace falta HTTPS o localhost).";
+    return;
+  }
+  try {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    await ctx.resume();
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    });
+  } catch (e) {
+    $("msg").textContent = "No se pudo acceder al micrófono: " + (e.name === "NotAllowedError" ? "permiso denegado." : e.message);
+    return;
+  }
+  const src = ctx.createMediaStreamSource(stream);
+  const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 35;
+  analyser = ctx.createAnalyser();
+  analyser.fftSize = 4096;
+  src.connect(hp).connect(analyser);
+  buf = new Float32Array(analyser.fftSize);
+  running = true;
+  $("start").style.display = "none";
+  $("hint").textContent = "Tocá una cuerda…";
+  try { wakeLock = await navigator.wakeLock?.request("screen"); } catch {}
+  loop();
+}
+
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "visible" && running) {
+    try { wakeLock = await navigator.wakeLock?.request("screen"); } catch {}
+    ctx?.resume();
+  }
+});
+
+function median(a) { const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; }
+
+function loop() {
+  if (!running) return;
+  requestAnimationFrame(loop);
+  const now = performance.now();
+  if (now - lastDetect < 60) return;
+  lastDetect = now;
+  analyser.getFloatTimeDomainData(buf);
+  let rms = 0; for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+  rms = Math.sqrt(rms / buf.length);
+  $("level").firstElementChild.style.width = Math.min(100, rms * 600) + "%";
+  if (now < refUntil) return; // no escucharse a sí mismo
+  let r = null;
+  if (rms > 0.004) {
+    r = cfg.mode === "guitar"
+      ? detectPitch(buf, ctx.sampleRate, 60, 1200)
+      : detectPitch(buf, ctx.sampleRate, 40, 2000);
+  }
+  if (!r || r.clarity < 0.85) {
+    if (now - lastHeard > 1200) idle();
+    return;
+  }
+  lastHeard = now;
+  // estabilizar: mediana de las últimas lecturas, reiniciar si cambia de nota
+  if (hist.length && Math.abs(1200 * Math.log2(r.freq / median(hist))) > 60) hist = [];
+  hist.push(r.freq); if (hist.length > 7) hist.shift();
+  show(median(hist), now);
+}
+
+function show(f, now) {
+  let target, label;
+  if (cfg.mode === "guitar") {
+    const m = freqToMidi(f);
+    target = GUITAR.reduce((a, s) => Math.abs(s.midi - m) < Math.abs(a.midi - m) ? s : a).midi;
+  } else {
+    target = Math.round(freqToMidi(f));
+  }
+  const cents = 1200 * Math.log2(f / midiToFreq(target));
+  const shown = Math.max(-50, Math.min(50, cents));
+  needleTarget = shown;
+  lastMidi = target;
+  $("note").innerHTML = `${nameOf(target)}<sub>${octOf(target)}</sub>`;
+  $("cents").textContent = (cents >= 0 ? "+" : "−") + Math.abs(cents).toFixed(1) + " cents";
+  $("freq").textContent = `${f.toFixed(2)} Hz · objetivo ${midiToFreq(target).toFixed(2)} Hz`;
+  const a = Math.abs(cents);
+  const cls = a <= IN_TUNE ? "ok" : a <= 10 ? "warn" : "bad";
+  for (const el of [$("note"), $("cents")]) { el.classList.remove("ok", "warn", "bad"); el.classList.add(cls); }
+  if (a > 50) $("hint").textContent = cents > 0 ? "Muy alta: aflojá bastante" : "Muy baja: tensá bastante";
+  else if (a <= IN_TUNE) $("hint").textContent = "¡Afinada!";
+  else $("hint").textContent = cents > 0 ? "Alta: aflojá un poco ▼" : "Baja: tensá un poco ▲";
+  // marcar cuerda afinada si se mantiene 0,6 s
+  if (target !== curTarget) { curTarget = target; tunedSince = 0; }
+  if (a <= IN_TUNE) { if (!tunedSince) tunedSince = now; } else tunedSince = 0;
+  if (cfg.mode === "guitar") {
+    if (tunedSince && now - tunedSince > 600) done.add(target);
+    for (const b of $("strings").children) {
+      const bm = +b.dataset.midi;
+      b.classList.toggle("active", bm === target);
+      b.classList.toggle("done", done.has(bm));
+    }
+  }
+}
+
+function idle() {
+  hist = [];
+  needleTarget = 0;
+  curTarget = null; tunedSince = 0;
+  $("hint").textContent = "Tocá una cuerda…";
+  for (const el of [$("note"), $("cents")]) el.classList.remove("ok", "warn", "bad");
+  for (const b of $("strings").children) b.classList.remove("active");
+}
+
+// ---------- Tono de referencia ----------
+let refNodes = null;
+function stopRef() {
+  if (!refNodes) return;
+  const t = ctx.currentTime;
+  refNodes.g.gain.cancelScheduledValues(t);
+  refNodes.g.gain.setValueAtTime(refNodes.g.gain.value, t);
+  refNodes.g.gain.linearRampToValueAtTime(0, t + 0.05);
+  refNodes.o.stop(t + 0.06);
+  refNodes.btn?.classList.remove("playing");
+  refNodes = null; refUntil = performance.now() + 250;
+}
+async function playRef(midi, btn) {
+  ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+  await ctx.resume();
+  const same = refNodes && refNodes.midi === midi;
+  stopRef();
+  if (same) return;
+  const t = ctx.currentTime, dur = 3;
+  const o = ctx.createOscillator();
+  // timbre con armónicos para que las notas graves se oigan en parlantes chicos
+  const amps = [0, 1, 0.6, 0.4, 0.3, 0.18, 0.12, 0.08];
+  o.setPeriodicWave(ctx.createPeriodicWave(new Float32Array(amps.length), new Float32Array(amps)));
+  o.frequency.value = midiToFreq(midi);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.35, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.15, t + 0.6);
+  g.gain.setValueAtTime(0.15, t + dur - 0.3);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  o.connect(g).connect(ctx.destination);
+  o.start(t); o.stop(t + dur + 0.05);
+  btn?.classList.add("playing");
+  refNodes = { o, g, midi, btn };
+  refUntil = performance.now() + dur * 1000 + 250;
+  o.onended = () => { if (refNodes && refNodes.o === o) { btn?.classList.remove("playing"); refNodes = null; } };
+}
+$("refBtn").onclick = () => { if (lastMidi != null) playRef(lastMidi, $("refBtn")); };
+
+// ---------- Controles ----------
+function setMode(m) {
+  cfg.mode = m; save();
+  $("mGuit").setAttribute("aria-pressed", m === "guitar");
+  $("mChrom").setAttribute("aria-pressed", m === "chrom");
+  hist = []; buildStrings(); idle();
+}
+function setNames(n) {
+  cfg.names = n; save();
+  $("nLat").setAttribute("aria-pressed", n === "lat");
+  $("nEng").setAttribute("aria-pressed", n === "eng");
+  buildStrings();
+  if (lastMidi != null && running && performance.now() - lastHeard < 1200)
+    $("note").innerHTML = `${nameOf(lastMidi)}<sub>${octOf(lastMidi)}</sub>`;
+}
+$("mGuit").onclick = () => setMode("guitar");
+$("mChrom").onclick = () => setMode("chrom");
+$("nLat").onclick = () => setNames("lat");
+$("nEng").onclick = () => setNames("eng");
+$("a4").value = cfg.a4; $("a4v").textContent = cfg.a4;
+$("a4").oninput = (e) => { cfg.a4 = +e.target.value; $("a4v").textContent = cfg.a4; save(); };
+$("start").onclick = start;
+
+setMode(cfg.mode); setNames(cfg.names);
+if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>

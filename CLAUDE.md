@@ -25,6 +25,7 @@ Al terminar cada tarea, antes del commit final:
 ## Proyectos
 | Carpeta | Descripción |
 |---------|-------------|
+| `afinador/` | PWA de afinador por micrófono (guitarra estándar + cromático, La ajustable, tono de referencia) |
 | `bot-whatsapp/` | Bot de WhatsApp de La Mandrágora: precio, stock, horarios y asesoramiento con Google Books (en diseño) |
 | `busqueda-ssd/` | Búsqueda periódica del SSD externo más barato en Mercado Libre (top 10 + Excel) |
 | `datos-tecnicos-libros/` | Buscar datos técnicos de libros a partir de ISBNs (en definición) |
