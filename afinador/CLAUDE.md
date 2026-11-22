@@ -29,8 +29,11 @@ HTML + JS puro, sin dependencias ni build (misma estructura que `metronomo/` y `
   cromático, nombres en inglés y La=442 (−2,9 cents) correctos; sin errores de consola.
 - NO probado con una guitarra real ni en un celular.
 
-## Dónde se usa (pendiente)
+## Dónde se usa
 - El micrófono exige HTTPS (o localhost). Los artifacts de claude.ai bloquean el micrófono,
   así que no sirve publicarlo ahí como el metrónomo.
-- PC: `python -m http.server 8000` DENTRO de `afinador` y abrir http://localhost:8000.
-- Celular: falta elegir hosting HTTPS (GitHub Pages, Netlify Drop, etc.).
+- Hosting elegido: Netlify Drop (https://app.netlify.com/drop). Se sube un zip con
+  `index.html`, `manifest.json`, `sw.js` e `icon.svg` (sin carpeta adentro), con la sesión de Netlify iniciada
+  para que el sitio no caduque. Pendiente: anotar acá la URL del sitio cuando el usuario la pase.
+- Para actualizar: en Netlify, sitio → Deploys → arrastrar el zip nuevo (misma URL).
+- PC sin internet: `python -m http.server 8000` DENTRO de `afinador` y abrir http://localhost:8000.
