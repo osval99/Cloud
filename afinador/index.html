@@ -240,7 +240,9 @@ async function start() {
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
     });
   } catch (e) {
-    $("msg").textContent = "No se pudo acceder al micrófono: " + (e.name === "NotAllowedError" ? "permiso denegado." : e.message);
+    $("msg").innerHTML = e.name === "NotAllowedError"
+      ? "No se pudo usar el micrófono (permiso denegado). Probá:<br>1) Si lo abriste desde WhatsApp u otra app, abrilo en Chrome (⋮ → Abrir en Chrome).<br>2) En Chrome: ícono a la izquierda de la dirección → Permisos → Micrófono → Permitir, y recargá.<br>3) Ajustes de Android → Aplicaciones → Chrome → Permisos → Micrófono → Permitir."
+      : "No se pudo acceder al micrófono: " + e.message;
     return;
   }
   const src = ctx.createMediaStreamSource(stream);

@@ -1,4 +1,4 @@
-const CACHE_NAME = "afinador-v1";
+const CACHE_NAME = "afinador-v2";
 const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", (event) => {

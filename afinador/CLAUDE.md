@@ -29,8 +29,11 @@ HTML + JS puro, sin dependencias ni build (misma estructura que `metronomo/` y `
   cromático, nombres en inglés y La=442 (−2,9 cents) correctos; sin errores de consola.
 - NO probado con una guitarra real ni en un celular.
 
-## Dónde se usa (pendiente)
-- El micrófono exige HTTPS (o localhost). Los artifacts de claude.ai bloquean el micrófono,
-  así que no sirve publicarlo ahí como el metrónomo.
-- PC: `python -m http.server 8000` DENTRO de `afinador` y abrir http://localhost:8000.
-- Celular: falta elegir hosting HTTPS (GitHub Pages, Netlify Drop, etc.).
+## Dónde se usa
+- El micrófono exige HTTPS (o localhost). Los artifacts de claude.ai bloquean el micrófono.
+- Publicado con GitHub Pages (el repo es público y Pages ya está activado):
+  https://osval99.github.io/Cloud/afinador/ — se actualiza solo al mergear a `add-readme`.
+  La URL no se pudo abrir desde la sesión en la nube (red bloqueada); confirmar en el celu.
+- Netlify descartado: el usuario no pudo crear cuenta.
+- Al cambiar archivos, subir la versión de caché en `sw.js` (ahora `afinador-v2`).
+- PC sin internet: `python -m http.server 8000` DENTRO de `afinador` y abrir http://localhost:8000.
