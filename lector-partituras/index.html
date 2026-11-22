@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Atril</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#16181d">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: biblioteca en una columna (lista + pestañas) y un atril a pantalla completa con fondo oscuro fijo. */
+:root {
+  --bg: #f1f2f6; --surface: #ffffff; --fg: #14161c; --muted: #5b6170; --line: #dcdfe8;
+  --accent: #3446c4; --accent-fg: #ffffff; --soft: #e4e7f6; --danger: #b8322a;
+  --stage: #16181d; --stage-fg: #e9ebf1; --stage-bar: rgba(22,24,29,.94); --stage-line: #2d313b;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-head: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101217; --surface: #1a1d24; --fg: #e8eaf0; --muted: #9aa0ae; --line: #2a2e38;
+  --accent: #8c98ff; --accent-fg: #0c0f22; --soft: #242a45; --danger: #ff7b6c; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #101217; --surface: #1a1d24; --fg: #e8eaf0; --muted: #9aa0ae; --line: #2a2e38;
+  --accent: #8c98ff; --accent-fg: #0c0f22; --soft: #242a45; --danger: #ff7b6c; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.45 var(--font-ui); -webkit-tap-highlight-color: transparent; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* ---------- Biblioteca ---------- */
+#lib { max-width: 760px; margin: 0 auto; padding-block: 12px 96px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top { display: flex; align-items: center; gap: 12px; padding-block: 8px 4px; }
+.brand { font: 700 26px/1 var(--font-head); letter-spacing: -.01em; margin: 0; flex: 1; display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 28px; height: 28px; }
+.tabs { display: flex; gap: 4px; background: var(--soft); padding: 4px; border-radius: 999px; margin-block: 12px; }
+.tabs button { flex: 1; border: 0; background: transparent; padding: 8px 12px; border-radius: 999px; font-weight: 600; color: var(--muted); }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.tools { display: flex; gap: 8px; margin-bottom: 10px; }
+.search { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 10px 12px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 8px 12px; white-space: nowrap; }
+.list { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding: 12px 8px 12px 14px; border-top: 1px solid var(--line); min-height: 64px; }
+.row:first-child { border-top: 0; }
+.row .main { flex: 1; min-width: 0; border: 0; background: none; text-align: left; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.row .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .sub { color: var(--muted); font-size: 13px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.badge { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 1px 7px; border-radius: 6px; background: var(--soft); color: var(--accent); }
+.icon-btn { border: 0; background: none; width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; color: var(--muted); flex: none; }
+.icon-btn:hover { background: var(--soft); }
+.icon-btn svg { width: 22px; height: 22px; }
+.empty { padding: 32px 16px; text-align: center; color: var(--muted); }
+.empty strong { display: block; color: var(--fg); font-size: 16px; margin-bottom: 4px; }
+.fab { position: fixed; right: max(18px, calc(env(safe-area-inset-right, 0px) + 18px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  border: 0; background: var(--accent); color: var(--accent-fg); border-radius: 999px; padding: 14px 20px; font-weight: 600;
+  display: flex; gap: 8px; align-items: center; box-shadow: 0 6px 20px rgba(30,40,120,.3); }
+.fab svg { width: 20px; height: 20px; }
+.note { font-size: 13px; color: var(--muted); margin-top: 14px; }
+.warn { background: #fff4d6; color: #5a4300; border-radius: var(--r); padding: 10px 12px; font-size: 13px; margin-bottom: 10px; }
+.btn { border: 0; background: var(--accent); color: var(--accent-fg); border-radius: var(--r); padding: 10px 16px; font-weight: 600; }
+.btn.ghost { background: var(--soft); color: var(--fg); }
+.btn.danger { background: var(--danger); color: #fff; }
+.set-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.set-head input { flex: 1; min-width: 0; font: 600 18px var(--font-head); border: 1px solid transparent; background: transparent; border-radius: 8px; padding: 6px 8px; }
+.set-head input:focus { border-color: var(--line); background: var(--surface); }
+.num { width: 24px; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+
+/* ---------- Hoja inferior (menús y diálogos) ---------- */
+#sheetBg { position: fixed; inset: 0; background: rgba(5,8,20,.45); z-index: 50; display: flex; align-items: flex-end; justify-content: center; }
+#sheet { background: var(--surface); color: var(--fg); width: 100%; max-width: 560px; border-radius: 18px 18px 0 0; max-height: 85%; overflow: auto;
+  padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 18px) max(16px, env(safe-area-inset-left, 0px));
+  display: flex; flex-direction: column; gap: 12px; }
+#sheet h2 { font: 700 18px var(--font-head); margin: 0; overflow-wrap: anywhere; }
+#sheet .opt { border: 0; background: var(--soft); border-radius: var(--r); padding: 12px 14px; text-align: left; font-weight: 500; }
+#sheet .opt.danger { color: var(--danger); }
+#sheet input[type=text] { border: 1px solid var(--line); background: var(--bg); border-radius: var(--r); padding: 10px 12px; width: 100%; }
+#sheet label.check { display: flex; gap: 10px; align-items: center; padding: 8px 4px; border-top: 1px solid var(--line); }
+#sheet .actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+#toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); transform: translateX(-50%); z-index: 80;
+  background: #1d2130; color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 14px; max-width: calc(100% - 32px); text-align: center; pointer-events: none; }
+
+/* ---------- Atril ---------- */
+#viewer { position: fixed; inset: 0; background: var(--stage); color: var(--stage-fg); z-index: 20; color-scheme: dark; }
+#stage { position: absolute; inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-user-select: none; user-select: none; }
+#spread { min-height: 100%; display: flex; justify-content: center; align-items: center; gap: 6px; }
+#stage.scrolls #spread { align-items: flex-start; }
+.pg { position: relative; background: #fff; flex: none; box-shadow: 0 2px 16px rgba(0,0,0,.45); }
+.pg canvas { display: block; }
+.pg canvas.ov { position: absolute; inset: 0; pointer-events: none; touch-action: auto; }
+#viewer.drawing .pg canvas.ov { pointer-events: auto; touch-action: none; cursor: crosshair; }
+#vmsg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: #b9bdc9; }
+.bar { position: absolute; left: 0; right: 0; background: var(--stage-bar); display: flex; align-items: center; gap: 4px; z-index: 5;
+  padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+#vtop { top: 0; padding-top: calc(env(safe-area-inset-top, 0px) + 6px); padding-bottom: 6px; border-bottom: 1px solid var(--stage-line); }
+#vbot { bottom: 0; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6px); padding-top: 6px; border-top: 1px solid var(--stage-line); flex-wrap: wrap; }
+#viewer:not(.chrome) #vtop, #viewer:not(.chrome) #vbot { display: none; }
+.vbtn { border: 0; background: none; color: var(--stage-fg); min-width: 42px; height: 42px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 8px; font-size: 13px; }
+.vbtn svg { width: 22px; height: 22px; }
+.vbtn[aria-pressed="true"] { background: #2f3550; color: #b8c0ff; }
+.vtitle { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; padding: 0 4px; }
+.vtitle b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vtitle span { font-size: 12px; color: #9aa0ae; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+#slider { flex: 1 1 160px; min-width: 120px; accent-color: #8c98ff; }
+#pnum { font-variant-numeric: tabular-nums; font-size: 13px; color: #c9cdd8; min-width: 56px; text-align: center; }
+#pchip { position: absolute; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); transform: translateX(-50%); background: rgba(0,0,0,.65);
+  color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-variant-numeric: tabular-nums; pointer-events: none; transition: opacity .4s; z-index: 4; }
+#vtoast { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 16px); transform: translateX(-50%); background: #2f3550; color: #fff;
+  padding: 8px 14px; border-radius: 999px; font-size: 14px; pointer-events: none; z-index: 9; max-width: calc(100% - 32px); text-align: center; }
+.panel { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 70px); z-index: 6;
+  background: #222633; border: 1px solid #353b4b; border-radius: 16px; padding: 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center;
+  width: max-content; max-width: calc(100% - 24px); box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+#viewer:not(.chrome) .panel { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+.sw { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #3a4052; padding: 0; }
+.sw[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 2px #8c98ff; }
+.sep { width: 1px; height: 26px; background: #3a4052; margin: 0 2px; }
+#mbpm { font: 700 28px/1 var(--font-head); width: 3ch; text-align: center; font-variant-numeric: tabular-nums; }
+#mbpmR { width: 140px; accent-color: #8c98ff; }
+#mdot { width: 16px; height: 16px; border-radius: 50%; background: #3a4052; transition: background .08s; }
+#mdot.on { background: #8c98ff; } #mdot.acc { background: #ffcf5c; }
+#mbeats { background: #2a2f3e; border: 1px solid #3a4052; border-radius: 8px; padding: 6px; color: #e9ebf1; }
+@media (prefers-reduced-motion: reduce) { #pchip, #mdot { transition: none; } }
+</style>
+</head>
+<body>
+
+<main id="lib">
+  <div class="top">
+    <h1 class="brand"><svg viewBox="0 0 512 512" aria-hidden="true"><rect width="512" height="512" rx="110" fill="var(--accent)"/><path d="M128 170h256M128 222h256M128 274h256M128 326h256M128 378h256" stroke="var(--accent-fg)" stroke-width="14" opacity=".55"/><ellipse cx="232" cy="352" rx="44" ry="32" transform="rotate(-22 232 352)" fill="var(--accent-fg)"/><path d="M270 344V130q60 20 80 70" fill="none" stroke="var(--accent-fg)" stroke-width="22" stroke-linecap="round"/></svg>Atril</h1>
+  </div>
+  <div id="warn" class="warn" hidden></div>
+  <div class="tabs" role="tablist">
+    <button id="tabLib" role="tab" aria-selected="true">Biblioteca</button>
+    <button id="tabSets" role="tab" aria-selected="false">Setlists</button>
+  </div>
+  <section id="paneLib">
+    <div class="tools">
+      <input id="q" class="search" type="search" placeholder="Buscar partitura" aria-label="Buscar partitura">
+      <button id="sortBtn" class="chip" type="button">Recientes</button>
+    </div>
+    <div id="docList" class="list"></div>
+    <p class="note">Abre PDF, imágenes (JPG, PNG, WebP) y MusicXML (.musicxml, .xml, .mxl). Si elegís varias imágenes juntas, se unen como páginas de una misma partitura. Las partituras quedan guardadas en este navegador.</p>
+  </section>
+  <section id="paneSets" hidden></section>
+  <button id="fab" class="fab" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Agregar</span></button>
+  <input id="file" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.bmp,.musicxml,.xml,.mxl,application/pdf,image/*" hidden>
+</main>
+
+<div id="viewer" hidden>
+  <div id="stage"><div id="spread"></div></div>
+  <div id="vmsg" hidden></div>
+  <div id="pchip" style="opacity:0"></div>
+  <div id="vtoast" hidden></div>
+
+  <div id="vtop" class="bar">
+    <button class="vbtn" id="vBack" aria-label="Volver a la biblioteca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="vtitle"><b id="vName"></b><span id="vSub"></span></div>
+    <button class="vbtn" id="vFull" aria-label="Pantalla completa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  </div>
+
+  <div id="vbot" class="bar">
+    <button class="vbtn" id="vPrev" aria-label="Página anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <input id="slider" type="range" min="1" max="1" value="1" aria-label="Ir a página">
+    <span id="pnum">1 / 1</span>
+    <button class="vbtn" id="vNext" aria-label="Página siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    <span class="sep"></span>
+    <button class="vbtn" id="vFit" aria-pressed="false" title="Ajuste">Página</button>
+    <button class="vbtn" id="vDual" aria-pressed="true" title="Dos páginas con el celular horizontal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="8" height="14" rx="1"/><rect x="13" y="5" width="8" height="14" rx="1"/></svg></button>
+    <button class="vbtn" id="vDraw" aria-pressed="false" aria-label="Anotar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg></button>
+    <button class="vbtn" id="vMetro" aria-pressed="false" aria-label="Metrónomo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M9 3h6l4 18H5z"/><path d="M12 16l5-9"/></svg></button>
+  </div>
+
+  <div id="drawbar" class="panel" hidden>
+    <button class="sw" data-pen="ink" style="background:#14161c" aria-label="Lápiz negro"></button>
+    <button class="sw" data-pen="red" style="background:#d0312d" aria-label="Lápiz rojo"></button>
+    <button class="sw" data-pen="blue" style="background:#1f5fd6" aria-label="Lápiz azul"></button>
+    <button class="sw" data-pen="hl" style="background:#ffd400" aria-label="Resaltador"></button>
+    <span class="sep"></span>
+    <button class="vbtn" data-size="1" aria-label="Trazo fino">Fino</button>
+    <button class="vbtn" data-size="2" aria-label="Trazo medio">Medio</button>
+    <button class="vbtn" data-size="3.5" aria-label="Trazo grueso">Grueso</button>
+    <span class="sep"></span>
+    <button class="vbtn" data-pen="eraser" aria-label="Goma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 20h12M4 15l9-9 6 6-7 7H8z"/></svg>Goma</button>
+    <button class="vbtn" id="dUndo" aria-label="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
+    <button class="vbtn" id="dClear">Borrar pág.</button>
+    <button class="vbtn" id="dDone" style="color:#b8c0ff;font-weight:600">Listo</button>
+  </div>
+
+  <div id="metro" class="panel" hidden>
+    <button class="vbtn" id="mMinus" aria-label="Bajar tempo">−</button>
+    <span id="mbpm">100</span>
+    <button class="vbtn" id="mPlus" aria-label="Subir tempo">+</button>
+    <input id="mbpmR" type="range" min="30" max="240" value="100" aria-label="Tempo">
+    <select id="mbeats" aria-label="Tiempos por compás"></select>
+    <button class="vbtn" id="mTap">Tap</button>
+    <span id="mdot"></span>
+    <button class="vbtn" id="mPlay" aria-label="Iniciar metrónomo" style="background:#2f3550"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg></button>
+  </div>
+</div>
+
+<div id="sheetBg" hidden><div id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="toast" hidden></div>
+
+<script>
+'use strict';
+const CDN = {
+  pdf: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  osmd: 'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js',
+};
+
+// ---------- utilidades ----------
+const $ = (s) => document.querySelector(s);
+function h(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const k of kids.flat()) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+}
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const icon = (d) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '2'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.innerHTML = d; return s; };
+const ICON_MORE = '<circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/>';
+let toastT;
+function toast(msg, ms = 2400) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), ms); }
+let vtoastT;
+function vtoast(msg, ms = 1800) { const t = $('#vtoast'); t.textContent = msg; t.hidden = false; clearTimeout(vtoastT); vtoastT = setTimeout(() => (t.hidden = true), ms); }
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+// ---------- almacenamiento (IndexedDB, con respaldo en memoria) ----------
+const Store = (() => {
+  const STORES = ['docs', 'files', 'anns', 'setlists', 'kv'];
+  let db = null, mem = null;
+  async function open() {
+    try {
+      db = await new Promise((res, rej) => {
+        const r = indexedDB.open('atril', 1);
+        r.onupgradeneeded = () => { for (const s of STORES) if (!r.result.objectStoreNames.contains(s)) r.result.createObjectStore(s); };
+        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); r.onblocked = () => rej(new Error('blocked'));
+      });
+    } catch { db = null; mem = Object.fromEntries(STORES.map((s) => [s, new Map()])); }
+    return !!db;
+  }
+  function run(store, mode, fn) {
+    return new Promise((res, rej) => {
+      const t = db.transaction(store, mode); const r = fn(t.objectStore(store));
+      t.oncomplete = () => res(r ? r.result : undefined); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+    });
+  }
+  return {
+    open,
+    get ok() { return !!db; },
+    get: (s, k) => db ? run(s, 'readonly', (o) => o.get(k)) : Promise.resolve(mem[s].get(k)),
+    put: (s, k, v) => db ? run(s, 'readwrite', (o) => o.put(v, k)) : (mem[s].set(k, v), Promise.resolve()),
+    del: (s, k) => db ? run(s, 'readwrite', (o) => o.delete(k)) : (mem[s].delete(k), Promise.resolve()),
+    all: (s) => db ? run(s, 'readonly', (o) => o.getAll()) : Promise.resolve([...mem[s].values()]),
+    delPrefix: (s, p) => db ? run(s, 'readwrite', (o) => o.delete(IDBKeyRange.bound(p, p + '￿')))
+      : (([...mem[s].keys()].filter((k) => k.startsWith(p)).forEach((k) => mem[s].delete(k))), Promise.resolve()),
+  };
+})();
+
+// ---------- estado ----------
+const S = { docs: [], sets: [], tab: 'lib', q: '', sort: LS.get('atril.sort', 'recent'), openSet: null };
+const CFG = Object.assign({ fit: 'page', dual: true, pen: 'ink', size: 1 }, LS.get('atril.cfg', {}));
+const saveCfg = () => LS.set('atril.cfg', CFG);
+const saveDoc = (d) => Store.put('docs', d.id, d);
+const saveSet = (s) => Store.put('setlists', s.id, s);
+const KIND = { pdf: 'PDF', img: 'Imagen', xml: 'MusicXML' };
+
+// ---------- carga de librerías ----------
+const scripts = {};
+function loadScript(src) {
+  return scripts[src] ||= new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = src; s.crossOrigin = 'anonymous';
+    s.onload = res; s.onerror = () => { delete scripts[src]; rej(new Error('No se pudo descargar ' + src.split('/').pop() + '. Revisá la conexión.')); };
+    document.head.append(s);
+  });
+}
+async function getPdfjs() {
+  // El "worker" se carga en la página misma: funciona sin Web Worker externo.
+  await loadScript(CDN.pdfWorker); await loadScript(CDN.pdf);
+  const lib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
+  lib.GlobalWorkerOptions.workerSrc = CDN.pdfWorker;
+  return lib;
+}
+async function getOsmd() { await loadScript(CDN.osmd); return window.opensheetmusicdisplay; }
+
+// ---------- documentos ----------
+function kindOf(file) {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (ext === 'pdf' || file.type === 'application/pdf') return 'pdf';
+  if (['musicxml', 'xml', 'mxl'].includes(ext) || /musicxml/.test(file.type)) return 'xml';
+  if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'].includes(ext) || /^image\/(png|jpe?g|webp|gif|bmp)$/.test(file.type)) return 'img';
+  return null;
+}
+const baseName = (n) => n.replace(/\.[^.]+$/, '').replace(/[_]+/g, ' ').trim() || n;
+
+function loadImage(blob) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(blob); const im = new Image();
+    im.onload = () => res(im); im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('No se pudo leer la imagen')); };
+    im.src = url;
+  });
+}
+function imagesDoc(imgs) {
+  return {
+    pages: imgs.length,
+    size: async (i) => ({ w: imgs[i].naturalWidth || imgs[i].width, h: imgs[i].naturalHeight || imgs[i].height }),
+    async paint(i, cv) { const c = cv.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0, 0, cv.width, cv.height); c.drawImage(imgs[i], 0, 0, cv.width, cv.height); },
+    destroy() { imgs.forEach((im) => im.src.startsWith('blob:') && URL.revokeObjectURL(im.src)); },
+  };
+}
+async function pdfDoc(blob) {
+  const lib = await getPdfjs();
+  const pdf = await lib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), isEvalSupported: false }).promise;
+  const sizes = {};
+  return {
+    pages: pdf.numPages,
+    async size(i) { if (!sizes[i]) { const v = (await pdf.getPage(i + 1)).getViewport({ scale: 1 }); sizes[i] = { w: v.width, h: v.height }; } return sizes[i]; },
+    async paint(i, cv) {
+      const p = await pdf.getPage(i + 1); const v1 = p.getViewport({ scale: 1 });
+      const vp = p.getViewport({ scale: cv.width / v1.width });
+      const c = cv.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0, 0, cv.width, cv.height);
+      await p.render({ canvasContext: c, viewport: vp }).promise;
+    },
+    destroy() { pdf.destroy(); },
+  };
+}
+function readBinary(blob) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsBinaryString(blob); }); }
+async function xmlDoc(blob, name) {
+  const O = await getOsmd();
+  const isZip = new Uint8Array(await blob.slice(0, 2).arrayBuffer()).join() === '80,75'; // "PK" = .mxl comprimido
+  const content = isZip ? await readBinary(blob) : await blob.text();
+  const host = h('div', { style: 'position:fixed;left:-30000px;top:0;width:1000px;background:#fff' });
+  document.body.append(host);
+  try {
+    const osmd = new O.OpenSheetMusicDisplay(host, { autoResize: false, backend: 'svg', pageFormat: 'A4_P', pageBackgroundColor: '#FFFFFF', drawTitle: true });
+    await osmd.load(content);
+    osmd.render();
+    const svgs = [...host.querySelectorAll('svg')];
+    if (!svgs.length) throw new Error('La partitura no tiene contenido para mostrar');
+    const imgs = await Promise.all(svgs.map((svg) => {
+      const r = svg.getBoundingClientRect();
+      svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svg.setAttribute('width', Math.round(r.width)); svg.setAttribute('height', Math.round(r.height));
+      return loadImage(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' }));
+    }));
+    return imagesDoc(imgs);
+  } finally { host.remove(); }
+}
+async function loadDoc(meta) {
+  const f = await Store.get('files', meta.id);
+  if (!f) throw new Error('No se encontró el archivo guardado de esta partitura.');
+  if (meta.kind === 'pdf') return pdfDoc(f.blobs[0]);
+  if (meta.kind === 'img') return imagesDoc(await Promise.all(f.blobs.map(loadImage)));
+  return xmlDoc(f.blobs[0]);
+}
+
+// ---------- importar ----------
+async function importFiles(list) {
+  const files = [...list]; if (!files.length) return;
+  const bad = [], imgs = [], added = [];
+  toast('Importando…', 10000);
+  for (const f of files) {
+    const k = kindOf(f);
+    if (!k) { bad.push(f.name); continue; }
+    if (k === 'img') { imgs.push(f); continue; }
+    added.push(await addDoc(baseName(f.name), k, [f]));
+  }
+  if (imgs.length) {
+    imgs.sort((a, b) => a.name.localeCompare(b.name, 'es', { numeric: true }));
+    added.push(await addDoc(baseName(imgs[0].name), 'img', imgs));
+  }
+  await refresh();
+  if (bad.length) toast('No se pudo abrir: ' + bad.join(', ') + ' (formato no soportado)', 4500);
+  else toast(added.length === 1 ? 'Partitura agregada' : `${added.length} partituras agregadas`);
+}
+async function addDoc(name, kind, blobs) {
+  const id = uid();
+  const meta = { id, name, kind, pages: kind === 'img' ? blobs.length : null, last: 0, added: Date.now(), opened: 0, bpm: 100, beats: 4 };
+  await Store.put('files', id, { blobs: blobs.map((b) => b.slice(0, b.size, b.type)) });
+  await saveDoc(meta);
+  return meta;
+}
+async function deleteDoc(id) {
+  await Store.del('docs', id); await Store.del('files', id); await Store.delPrefix('anns', id + ':');
+  for (const s of S.sets) if (s.items.includes(id)) { s.items = s.items.filter((x) => x !== id); await saveSet(s); }
+  await refresh();
+}
+
+// ---------- ejemplo inicial ----------
+function sampleXML() {
+  const bars = ['E4q G4q C5q G4q', 'A4q F4q D4h', 'G4q E4q C4q E4q', 'D4w',
+                'E4q G4q C5q E5q', 'D5q B4q G4h', 'A4q F4q D4q B3q', 'C4w'];
+  const D = { q: [1, 'quarter'], h: [2, 'half'], w: [4, 'whole'] };
+  const ms = bars.map((b, i) => {
+    const notes = b.split(' ').map((n) => { const [, st, oc, d] = n.match(/([A-G])(\d)([qhw])/);
+      return `<note><pitch><step>${st}</step><octave>${oc}</octave></pitch><duration>${D[d][0]}</duration><type>${D[d][1]}</type></note>`; }).join('');
+    const attr = i === 0 ? '<attributes><divisions>1</divisions><key><fifths>0</fifths></key><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>' : '';
+    const bar = i === bars.length - 1 ? '<barline location="right"><bar-style>light-heavy</bar-style></barline>' : '';
+    return `<measure number="${i + 1}">${attr}${notes}${bar}</measure>`;
+  }).join('');
+  return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="3.1"><work><work-title>Melodía de ejemplo</work-title></work><part-list><score-part id="P1"><part-name>Melodía</part-name></score-part></part-list><part id="P1">${ms}</part></score-partwise>`;
+}
+async function seedIfEmpty() {
+  if (await Store.get('kv', 'seeded')) return;
+  await Store.put('kv', 'seeded', true);
+  if ((await Store.all('docs')).length) return;
+  const m = await addDoc('Ejemplo — Melodía en Do (podés borrarla)', 'xml', [new Blob([sampleXML()], { type: 'application/vnd.recordare.musicxml+xml' })]);
+  await saveSet({ id: uid(), name: 'Ensayo de ejemplo', items: [m.id], created: Date.now() });
+}
+
+// ---------- biblioteca ----------
+async function refresh() {
+  S.docs = await Store.all('docs'); S.sets = (await Store.all('setlists')).sort((a, b) => a.created - b.created);
+  renderLib();
+}
+function sortedDocs() {
+  const q = S.q.trim().toLowerCase();
+  let d = S.docs.filter((x) => !q || x.name.toLowerCase().includes(q));
+  if (S.sort === 'az') d.sort((a, b) => a.name.localeCompare(b.name, 'es', { numeric: true }));
+  else d.sort((a, b) => (b.opened || b.added) - (a.opened || a.added));
+  return d;
+}
+function docSub(d) {
+  return [h('span', { class: 'badge' }, KIND[d.kind]),
+    d.pages ? h('span', {}, d.pages === 1 ? '1 página' : `${d.pages} páginas`) : null,
+    d.pages > 1 && d.last > 0 ? h('span', {}, `· quedaste en la ${d.last + 1}`) : null];
+}
+function renderLib() {
+  $('#tabLib').setAttribute('aria-selected', S.tab === 'lib'); $('#tabSets').setAttribute('aria-selected', S.tab === 'sets');
+  $('#paneLib').hidden = S.tab !== 'lib'; $('#paneSets').hidden = S.tab !== 'sets';
+  $('#sortBtn').textContent = S.sort === 'az' ? 'A–Z' : 'Recientes';
+  $('#fab').querySelector('span').textContent = S.tab === 'sets' && !S.openSet ? 'Nuevo setlist' : 'Agregar';
+  $('#fab').hidden = S.tab === 'sets' && !!S.openSet;
+  const list = $('#docList'); list.replaceChildren();
+  const docs = sortedDocs();
+  if (!docs.length) list.append(h('div', { class: 'empty' }, h('strong', {}, S.q ? 'Sin resultados' : 'Tu biblioteca está vacía'), S.q ? 'Probá con otra palabra.' : 'Tocá «Agregar» para elegir partituras del celular.'));
+  for (const d of docs) list.append(h('div', { class: 'row' },
+    h('button', { class: 'main', onclick: () => openViewer(d.id) }, h('span', { class: 'name' }, d.name), h('span', { class: 'sub' }, docSub(d))),
+    h('button', { class: 'icon-btn', 'aria-label': 'Opciones de ' + d.name, onclick: () => docMenu(d) }, icon(ICON_MORE))));
+  renderSets();
+}
+function renderSets() {
+  const p = $('#paneSets'); p.replaceChildren();
+  const s = S.sets.find((x) => x.id === S.openSet);
+  if (!s) {
+    S.openSet = null;
+    const list = h('div', { class: 'list' });
+    if (!S.sets.length) list.append(h('div', { class: 'empty' }, h('strong', {}, 'Sin setlists'), 'Un setlist es el repertorio de un ensayo o concierto, en orden. Al terminar una partitura pasa sola a la siguiente.'));
+    for (const x of S.sets) list.append(h('div', { class: 'row' },
+      h('button', { class: 'main', onclick: () => { S.openSet = x.id; renderLib(); } }, h('span', { class: 'name' }, x.name),
+        h('span', { class: 'sub' }, x.items.length === 1 ? '1 partitura' : `${x.items.length} partituras`)),
+      h('button', { class: 'icon-btn', 'aria-label': 'Tocar ' + x.name, onclick: () => playSet(x, 0) }, icon('<path d="M7 4l13 8-13 8z" fill="currentColor"/>'))));
+    p.append(list); return;
+  }
+  const docs = s.items.map((id) => S.docs.find((d) => d.id === id)).filter(Boolean);
+  const name = h('input', { type: 'text', value: s.name, 'aria-label': 'Nombre del setlist', id: 'setName' });
+  name.addEventListener('change', async () => { s.name = name.value.trim() || s.name; await saveSet(s); });
+  p.append(h('div', { class: 'set-head' },
+    h('button', { class: 'icon-btn', 'aria-label': 'Volver a setlists', onclick: () => { S.openSet = null; renderLib(); } }, icon('<path d="M15 5l-7 7 7 7"/>')),
+    name,
+    h('button', { class: 'btn', onclick: () => playSet(s, 0), disabled: !docs.length }, '▶ Tocar')));
+  const list = h('div', { class: 'list' });
+  if (!docs.length) list.append(h('div', { class: 'empty' }, h('strong', {}, 'Setlist vacío'), 'Agregá partituras de tu biblioteca.'));
+  docs.forEach((d, i) => list.append(h('div', { class: 'row' },
+    h('span', { class: 'num' }, i + 1),
+    h('button', { class: 'main', onclick: () => playSet(s, i) }, h('span', { class: 'name' }, d.name), h('span', { class: 'sub' }, docSub(d))),
+    h('button', { class: 'icon-btn', 'aria-label': 'Subir', disabled: i === 0, onclick: () => moveItem(s, i, -1) }, icon('<path d="M6 15l6-6 6 6"/>')),
+    h('button', { class: 'icon-btn', 'aria-label': 'Bajar', disabled: i === docs.length - 1, onclick: () => moveItem(s, i, 1) }, icon('<path d="M6 9l6 6 6-6"/>')),
+    h('button', { class: 'icon-btn', 'aria-label': 'Quitar del setlist', onclick: async () => { s.items.splice(i, 1); await saveSet(s); renderLib(); } }, icon('<path d="M6 6l12 12M18 6L6 18"/>')))));
+  p.append(list);
+  p.append(h('div', { style: 'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap' },
+    h('button', { class: 'btn ghost', onclick: () => pickDocs(s) }, '+ Agregar partituras'),
+    h('button', { class: 'btn ghost', style: 'color:var(--danger)', onclick: () => confirmSheet(`¿Borrar el setlist «${s.name}»?`, 'Las partituras siguen en la biblioteca.', 'Borrar setlist', async () => { await Store.del('setlists', s.id); S.openSet = null; await refresh(); }) }, 'Borrar setlist')));
+  // los ids de partituras borradas se limpian solos
+  if (docs.length !== s.items.length) { s.items = docs.map((d) => d.id); saveSet(s); }
+}
+async function moveItem(s, i, dir) { const j = i + dir; [s.items[i], s.items[j]] = [s.items[j], s.items[i]]; await saveSet(s); renderLib(); }
+
+// ---------- hoja de opciones ----------
+function openSheet(...nodes) { $('#sheet').replaceChildren(...nodes); $('#sheetBg').hidden = false; }
+function closeSheet() { $('#sheetBg').hidden = true; }
+$('#sheetBg').addEventListener('click', (e) => { if (e.target.id === 'sheetBg') closeSheet(); });
+function confirmSheet(title, text, label, fn) {
+  openSheet(h('h2', {}, title), text ? h('div', { style: 'color:var(--muted)' }, text) : null,
+    h('div', { class: 'actions' }, h('button', { class: 'btn ghost', onclick: closeSheet }, 'Cancelar'),
+      h('button', { class: 'btn danger', onclick: async () => { closeSheet(); await fn(); } }, label)));
+}
+function docMenu(d) {
+  openSheet(h('h2', {}, d.name),
+    h('button', { class: 'opt', onclick: () => openViewer(d.id).then(closeSheet) }, 'Abrir'),
+    h('button', { class: 'opt', onclick: () => renameSheet(d) }, 'Cambiar nombre'),
+    h('button', { class: 'opt', onclick: () => addToSetSheet(d) }, 'Agregar a un setlist'),
+    h('button', { class: 'opt danger', onclick: () => confirmSheet(`¿Borrar «${d.name}»?`, 'Se borran el archivo y sus anotaciones de este celular.', 'Borrar', () => deleteDoc(d.id)) }, 'Borrar'));
+}
+function renameSheet(d) {
+  const inp = h('input', { type: 'text', value: d.name, id: 'renameInput', 'aria-label': 'Nuevo nombre' });
+  const go = async () => { const v = inp.value.trim(); if (v) { d.name = v; await saveDoc(d); } closeSheet(); refresh(); };
+  inp.addEventListener('keydown', (e) => e.key === 'Enter' && go());
+  openSheet(h('h2', {}, 'Cambiar nombre'), inp, h('div', { class: 'actions' }, h('button', { class: 'btn ghost', onclick: closeSheet }, 'Cancelar'), h('button', { class: 'btn', onclick: go }, 'Guardar')));
+  setTimeout(() => inp.select(), 50);
+}
+function newSetSheet(after) {
+  const inp = h('input', { type: 'text', id: 'newSetInput', placeholder: 'Ej.: Ensayo del sábado', 'aria-label': 'Nombre del setlist' });
+  const go = async () => { const s = { id: uid(), name: inp.value.trim() || 'Setlist nuevo', items: [], created: Date.now() }; await saveSet(s); closeSheet(); await refresh(); after && after(s); };
+  inp.addEventListener('keydown', (e) => e.key === 'Enter' && go());
+  openSheet(h('h2', {}, 'Nuevo setlist'), inp, h('div', { class: 'actions' }, h('button', { class: 'btn ghost', onclick: closeSheet }, 'Cancelar'), h('button', { class: 'btn', onclick: go }, 'Crear')));
+  setTimeout(() => inp.focus(), 50);
+}
+function addToSetSheet(d) {
+  const add = async (s) => { if (!s.items.includes(d.id)) s.items.push(d.id); await saveSet(s); closeSheet(); toast(`Agregada a «${s.name}»`); refresh(); };
+  openSheet(h('h2', {}, 'Agregar a un setlist'),
+    ...S.sets.map((s) => h('button', { class: 'opt', onclick: () => add(s) }, s.name + (s.items.includes(d.id) ? ' (ya está)' : ''))),
+    h('button', { class: 'opt', style: 'color:var(--accent)', onclick: () => newSetSheet(add) }, '+ Nuevo setlist'));
+}
+function pickDocs(s) {
+  const docs = [...S.docs].sort((a, b) => a.name.localeCompare(b.name, 'es', { numeric: true }));
+  const boxes = docs.map((d) => { const c = h('input', { type: 'checkbox', id: 'pick-' + d.id }); return [d, c]; });
+  openSheet(h('h2', {}, `Agregar a «${s.name}»`),
+    docs.length ? h('div', {}, boxes.map(([d, c]) => h('label', { class: 'check', for: 'pick-' + d.id }, c, h('span', {}, d.name, s.items.includes(d.id) ? h('span', { style: 'color:var(--muted)' }, ' (ya está)') : null)))) : h('div', { class: 'empty' }, 'La biblioteca está vacía.'),
+    h('div', { class: 'actions' }, h('button', { class: 'btn ghost', onclick: closeSheet }, 'Cancelar'),
+      h('button', { class: 'btn', onclick: async () => { for (const [d, c] of boxes) if (c.checked) s.items.push(d.id); await saveSet(s); closeSheet(); renderLib(); } }, 'Agregar')));
+}
+
+// ---------- atril ----------
+const V = { meta: null, doc: null, page: 0, set: null, tok: 0, cache: new Map(), anns: new Map(), draw: false, undo: [], wake: null, toEnd: false };
+const stage = $('#stage'), spread = $('#spread');
+const twoUp = () => CFG.dual && stage.clientWidth > stage.clientHeight && V.doc && V.doc.pages > 1;
+const step = () => (twoUp() ? 2 : 1);
+
+async function openViewer(id, opts = {}) {
+  const meta = S.docs.find((d) => d.id === id); if (!meta) return;
+  closeSheet();
+  if (!V.meta) { try { history.pushState({ atril: 1 }, ''); } catch {} }
+  $('#viewer').hidden = false; $('#lib').setAttribute('aria-hidden', 'true');
+  if (V.doc) { V.doc.destroy && V.doc.destroy(); }
+  V.meta = meta; V.doc = null; V.set = opts.set || null; V.cache.clear(); V.anns.clear(); V.undo = [];
+  spread.replaceChildren(); setDraw(false);
+  if (!opts.set || opts.page === 0 && !opts.auto) $('#viewer').classList.add('chrome');
+  showMsg('Abriendo «' + meta.name + '»…');
+  updateChrome();
+  try { V.doc = await loadDoc(meta); }
+  catch (e) { showMsg('No se pudo abrir esta partitura.\n' + (e && e.message ? e.message : '')); return; }
+  if (V.meta !== meta) return;
+  showMsg(null);
+  meta.pages = V.doc.pages; meta.opened = Date.now();
+  const start = opts.page === 'last' ? lastStart() : opts.page ?? meta.last ?? 0;
+  V.page = clamp(start, 0, V.doc.pages - 1);
+  saveDoc(meta);
+  metroLoad();
+  await show();
+  wakeLock();
+}
+function lastStart() { const n = V.doc.pages; return twoUp() ? Math.max(0, n - 2 + (n % 2 ? 1 : 0)) : n - 1; }
+function showMsg(t) { const m = $('#vmsg'); m.hidden = !t; m.textContent = t || ''; m.style.whiteSpace = 'pre-line'; }
+function closeViewer() {
+  if (!V.meta) return;
+  metroStop(); setDraw(false); $('#metro').hidden = true; $('#vMetro').setAttribute('aria-pressed', 'false');
+  if (V.doc && V.doc.destroy) V.doc.destroy();
+  V.meta = null; V.doc = null; V.cache.clear(); spread.replaceChildren();
+  $('#viewer').hidden = true; $('#lib').removeAttribute('aria-hidden');
+  if (V.wake) { V.wake.release().catch(() => {}); V.wake = null; }
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  refresh();
+}
+window.addEventListener('popstate', () => { if (V.meta) closeViewer(); });
+$('#vBack').onclick = () => { if (history.state && history.state.atril) history.back(); else closeViewer(); };
+
+function slotBox() {
+  const W = stage.clientWidth, H = stage.clientHeight;
+  return { W: twoUp() ? (W - 6) / 2 : W, H };
+}
+async function pageBox(i) {
+  const sz = await V.doc.size(i), { W, H } = slotBox();
+  const sc = CFG.fit === 'width' && !twoUp() ? W / sz.w : Math.min(W / sz.w, H / sz.h);
+  const cw = Math.max(1, Math.floor(sz.w * sc)), ch = Math.max(1, Math.floor(sz.h * sc));
+  let px = Math.min(window.devicePixelRatio || 1, 3);
+  if (cw * ch * px * px > 1.6e7) px = Math.sqrt(1.6e7 / (cw * ch));
+  return { cw, ch, px };
+}
+function renderCanvas(i, b) {
+  const key = `${i}|${b.cw}x${b.ch}|${b.px.toFixed(2)}`;
+  if (V.cache.has(key)) { const p = V.cache.get(key); V.cache.delete(key); V.cache.set(key, p); return p; }
+  const doc = V.doc;
+  const p = (async () => { const cv = document.createElement('canvas'); cv.width = Math.round(b.cw * b.px); cv.height = Math.round(b.ch * b.px); await doc.paint(i, cv); return cv; })();
+  p.catch(() => V.cache.delete(key));
+  V.cache.set(key, p);
+  while (V.cache.size > 8) V.cache.delete(V.cache.keys().next().value);
+  return p;
+}
+async function getAnns(i) {
+  if (!V.anns.has(i)) V.anns.set(i, (await Store.get('anns', `${V.meta.id}:${i}`)) || []);
+  return V.anns.get(i);
+}
+async function buildPage(i) {
+  const b = await pageBox(i);
+  const [cv, strokes] = await Promise.all([renderCanvas(i, b), getAnns(i)]);
+  cv.className = 'pdoc'; cv.style.width = b.cw + 'px'; cv.style.height = b.ch + 'px';
+  const ov = h('canvas', { class: 'ov', width: Math.round(b.cw * b.px), height: Math.round(b.ch * b.px) });
+  ov.style.width = b.cw + 'px'; ov.style.height = b.ch + 'px';
+  const wrap = h('div', { class: 'pg', 'data-page': i, style: `width:${b.cw}px;height:${b.ch}px` }, cv, ov);
+  wrap._b = b; wrap._i = i;
+  drawStrokes(ov, b, strokes);
+  attachDraw(ov, wrap);
+  return wrap;
+}
+async function show() {
+  if (!V.doc) return;
+  const tok = ++V.tok;
+  const idx = [V.page]; if (twoUp() && V.page + 1 < V.doc.pages) idx.push(V.page + 1);
+  let pages;
+  try { pages = await Promise.all(idx.map(buildPage)); }
+  catch (e) { if (tok === V.tok) showMsg('Error al dibujar la página: ' + (e.message || e)); return; }
+  if (tok !== V.tok) return;
+  spread.replaceChildren(...pages);
+  stage.classList.toggle('scrolls', spread.scrollHeight > stage.clientHeight + 1);
+  stage.scrollTop = V.toEnd ? stage.scrollHeight : 0; V.toEnd = false;
+  updateChrome(); chip();
+  if (V.meta.last !== V.page) { V.meta.last = V.page; saveDoc(V.meta); }
+  // precargar la siguiente página
+  const nx = V.page + step();
+  if (nx < V.doc.pages) setTimeout(() => { if (tok === V.tok) pageBox(nx).then((b) => renderCanvas(nx, b)).catch(() => {}); }, 60);
+}
+function updateChrome() {
+  const m = V.meta; if (!m) return;
+  $('#vName').textContent = m.name;
+  const n = V.doc ? V.doc.pages : m.pages || 1;
+  const set = V.set && S.sets.find((s) => s.id === V.set.id);
+  $('#vSub').textContent = (set ? `${set.name} · ${V.set.idx + 1} de ${set.items.length} · ` : '') + (n === 1 ? '1 página' : `${n} páginas`);
+  const sl = $('#slider'); sl.max = n; sl.value = V.page + 1; sl.disabled = n < 2;
+  $('#pnum').textContent = pageLabel();
+  $('#vFit').textContent = CFG.fit === 'width' ? 'Ancho' : 'Página';
+  $('#vFit').setAttribute('aria-pressed', CFG.fit === 'width');
+  $('#vDual').setAttribute('aria-pressed', CFG.dual);
+}
+function pageLabel() {
+  const n = V.doc ? V.doc.pages : 1;
+  return twoUp() && V.page + 1 < n ? `${V.page + 1}–${V.page + 2} / ${n}` : `${V.page + 1} / ${n}`;
+}
+let chipT;
+function chip() { const c = $('#pchip'); if ($('#viewer').classList.contains('chrome')) { c.style.opacity = 0; return; } c.textContent = pageLabel(); c.style.opacity = 1; clearTimeout(chipT); chipT = setTimeout(() => (c.style.opacity = 0), 1200); }
+
+function go(page, toEnd = false) { V.page = clamp(page, 0, V.doc.pages - 1); V.toEnd = toEnd; show(); }
+function next() {
+  if (!V.doc) return;
+  if (stage.scrollTop + stage.clientHeight < stage.scrollHeight - 4) { stage.scrollBy({ top: stage.clientHeight * 0.85, behavior: 'smooth' }); return; }
+  if (V.page + step() < V.doc.pages) return go(V.page + step());
+  const set = V.set && S.sets.find((s) => s.id === V.set.id);
+  if (set && V.set.idx + 1 < set.items.length) { const i = V.set.idx + 1; vtoast('Siguiente: ' + (S.docs.find((d) => d.id === set.items[i]) || {}).name); return openViewer(set.items[i], { set: { id: set.id, idx: i }, page: 0, auto: true }); }
+  vtoast(set ? 'Fin del setlist' : 'Última página');
+}
+function prev() {
+  if (!V.doc) return;
+  if (stage.scrollTop > 4) { stage.scrollBy({ top: -stage.clientHeight * 0.85, behavior: 'smooth' }); return; }
+  if (V.page > 0) return go(V.page - step(), true);
+  const set = V.set && S.sets.find((s) => s.id === V.set.id);
+  if (set && V.set.idx > 0) { const i = V.set.idx - 1; return openViewer(set.items[i], { set: { id: set.id, idx: i }, page: 'last', auto: true }); }
+  vtoast('Primera página');
+}
+function playSet(s, idx) { if (s.items[idx]) openViewer(s.items[idx], { set: { id: s.id, idx }, page: 0 }); }
+
+// toques: izquierda = atrás, derecha = adelante, centro = mostrar/ocultar controles
+stage.addEventListener('click', (e) => {
+  if (V.draw || !V.doc) return;
+  const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
+  const v = $('#viewer');
+  if (x < 0.35 || x > 0.65) { if ($('#metro').hidden) v.classList.remove('chrome'); x < 0.35 ? prev() : next(); }
+  else v.classList.toggle('chrome');
+});
+$('#vmsg').addEventListener('click', () => $('#viewer').classList.add('chrome'));
+document.addEventListener('keydown', (e) => {
+  if (!V.meta || !$('#sheetBg').hidden || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) && document.activeElement.type !== 'range') return;
+  if (['ArrowRight', 'PageDown', 'ArrowDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+  else if (['ArrowLeft', 'PageUp', 'ArrowUp', 'Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+});
+$('#vPrev').onclick = prev; $('#vNext').onclick = next;
+$('#slider').oninput = (e) => { $('#pnum').textContent = `${e.target.value} / ${V.doc ? V.doc.pages : 1}`; };
+$('#slider').onchange = (e) => go(+e.target.value - 1);
+$('#vFit').onclick = () => { CFG.fit = CFG.fit === 'page' ? 'width' : 'page'; saveCfg(); show(); };
+$('#vDual').onclick = () => { CFG.dual = !CFG.dual; saveCfg(); if (twoUp() && V.page % 2) V.page--; show(); };
+$('#vFull').onclick = () => { const d = document; (d.fullscreenElement ? d.exitFullscreen() : d.documentElement.requestFullscreen()).catch(() => vtoast('Pantalla completa no disponible acá')); };
+let rT;
+window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { if (V.doc) { if (twoUp() && V.page % 2) V.page--; show(); } }, 150); });
+async function wakeLock() { try { V.wake = await navigator.wakeLock.request('screen'); } catch {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && V.meta) wakeLock(); });
+
+// ---------- anotaciones ----------
+const PENS = { ink: { c: '#14161c', a: 1, w: 0.0022 }, red: { c: '#d0312d', a: 1, w: 0.0022 }, blue: { c: '#1f5fd6', a: 1, w: 0.0022 }, hl: { c: '#ffd400', a: 0.38, w: 0.012 } };
+function drawStrokes(ov, b, strokes) {
+  const c = ov.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, ov.width, ov.height);
+  c.setTransform(b.px, 0, 0, b.px, 0, 0); c.lineCap = 'round'; c.lineJoin = 'round';
+  for (const s of strokes) {
+    c.globalAlpha = s.a; c.strokeStyle = s.c; c.lineWidth = Math.max(0.8, s.w * b.cw);
+    c.beginPath(); const p = s.p;
+    c.moveTo(p[0] * b.cw, p[1] * b.ch);
+    if (p.length === 2) c.lineTo(p[0] * b.cw + 0.01, p[1] * b.ch);
+    for (let k = 2; k < p.length; k += 2) c.lineTo(p[k] * b.cw, p[k + 1] * b.ch);
+    c.stroke();
+  }
+  c.globalAlpha = 1;
+}
+function attachDraw(ov, wrap) {
+  let cur = null;
+  const pt = (e) => { const r = ov.getBoundingClientRect(); return [clamp((e.clientX - r.left) / r.width, 0, 1), clamp((e.clientY - r.top) / r.height, 0, 1)]; };
+  const strokes = () => V.anns.get(wrap._i) || [];
+  const erase = ([x, y]) => {
+    const b = wrap._b, ar = b.ch / b.cw, R = 0.02, list = strokes();
+    const keep = list.filter((s) => { for (let k = 0; k < s.p.length; k += 2) { const dx = s.p[k] - x, dy = (s.p[k + 1] - y) * ar; if (dx * dx + dy * dy < R * R) return false; } return true; });
+    if (keep.length !== list.length) { if (!cur.erased) { V.undo.push({ i: wrap._i, prev: list }); cur.erased = true; } V.anns.set(wrap._i, keep); drawStrokes(ov, b, keep); }
+  };
+  ov.addEventListener('pointerdown', (e) => {
+    if (!V.draw) return; e.preventDefault(); e.stopPropagation();
+    try { ov.setPointerCapture(e.pointerId); } catch {}
+    const p = pt(e);
+    if (CFG.pen === 'eraser') { cur = { erase: true }; erase(p); return; }
+    const pen = PENS[CFG.pen] || PENS.ink;
+    cur = { c: pen.c, a: pen.a, w: pen.w * CFG.size, p: [+p[0].toFixed(4), +p[1].toFixed(4)] };
+    V.undo.push({ i: wrap._i, prev: strokes() });
+    V.anns.set(wrap._i, [...strokes(), cur]); drawStrokes(ov, wrap._b, strokes());
+  });
+  ov.addEventListener('pointermove', (e) => {
+    if (!cur) return; e.preventDefault();
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    if (cur.erase) { evs.forEach((ev) => erase(pt(ev))); return; }
+    for (const ev of evs) { const p = pt(ev); cur.p.push(+p[0].toFixed(4), +p[1].toFixed(4)); }
+    drawStrokes(ov, wrap._b, strokes());
+  });
+  const end = () => { if (!cur) return; const changed = !cur.erase || cur.erased; cur = null; if (changed) saveAnns(wrap._i); };
+  ov.addEventListener('pointerup', end); ov.addEventListener('pointercancel', end);
+  ov.addEventListener('click', (e) => { if (V.draw) e.stopPropagation(); });
+}
+function saveAnns(i) { const s = V.anns.get(i) || []; const k = `${V.meta.id}:${i}`; return s.length ? Store.put('anns', k, s) : Store.del('anns', k); }
+function redrawPage(i) { const w = [...spread.children].find((x) => x._i === i); if (w) drawStrokes(w.querySelector('.ov'), w._b, V.anns.get(i) || []); }
+function setDraw(on) {
+  V.draw = on; $('#viewer').classList.toggle('drawing', on); $('#drawbar').hidden = !on; $('#vDraw').setAttribute('aria-pressed', on);
+  if (on) { $('#metro').hidden = true; $('#vMetro').setAttribute('aria-pressed', 'false'); stage.style.overflowY = CFG.fit === 'width' ? 'auto' : 'hidden'; } else stage.style.overflowY = '';
+  document.querySelectorAll('#drawbar [data-pen]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.pen === CFG.pen));
+  document.querySelectorAll('#drawbar [data-size]').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.size === CFG.size));
+}
+$('#vDraw').onclick = () => setDraw(!V.draw);
+$('#dDone').onclick = () => setDraw(false);
+document.querySelectorAll('#drawbar [data-pen]').forEach((b) => (b.onclick = () => { CFG.pen = b.dataset.pen; saveCfg(); setDraw(true); }));
+document.querySelectorAll('#drawbar [data-size]').forEach((b) => (b.onclick = () => { CFG.size = +b.dataset.size; if (CFG.pen === 'eraser') CFG.pen = 'ink'; saveCfg(); setDraw(true); }));
+$('#dUndo').onclick = async () => { const u = V.undo.pop(); if (!u) return vtoast('Nada para deshacer'); V.anns.set(u.i, u.prev); await saveAnns(u.i); redrawPage(u.i); };
+$('#dClear').onclick = async () => {
+  const shown = [...spread.children].map((w) => w._i);
+  for (const i of shown) { const list = V.anns.get(i) || []; if (list.length) { V.undo.push({ i, prev: list }); V.anns.set(i, []); await saveAnns(i); redrawPage(i); } }
+  vtoast('Anotaciones borradas (podés deshacer)');
+};
+
+// ---------- metrónomo ----------
+const M = { ctx: null, on: false, bpm: 100, beats: 4, next: 0, beat: 0, timer: null, taps: [] };
+for (let i = 1; i <= 12; i++) $('#mbeats').append(h('option', { value: i }, i === 1 ? 'Sin acento' : `${i} tiempos`));
+function metroUI() { $('#mbpm').textContent = M.bpm; $('#mbpmR').value = M.bpm; $('#mbeats').value = M.beats;
+  $('#mPlay').innerHTML = M.on ? '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>' : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>';
+  $('#mPlay').setAttribute('aria-label', M.on ? 'Detener metrónomo' : 'Iniciar metrónomo'); }
+function metroLoad() { M.bpm = V.meta.bpm || 100; M.beats = V.meta.beats || 4; metroUI(); }
+let mSaveT;
+function setBpm(v) { M.bpm = clamp(Math.round(v), 30, 240); metroUI(); if (V.meta) { V.meta.bpm = M.bpm; V.meta.beats = M.beats; clearTimeout(mSaveT); mSaveT = setTimeout(() => saveDoc(V.meta), 400); } }
+function click(t, acc) {
+  const o = M.ctx.createOscillator(), g = M.ctx.createGain();
+  o.type = 'square'; o.frequency.value = acc ? 1750 : 1100;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(acc ? 0.5 : 0.3, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+  o.connect(g).connect(M.ctx.destination); o.start(t); o.stop(t + 0.05);
+}
+function metroTick() {
+  while (M.next < M.ctx.currentTime + 0.12) {
+    const acc = M.beat === 0 && M.beats > 1, t = M.next;
+    click(t, acc);
+    setTimeout(() => { const d = $('#mdot'); d.className = acc ? 'acc' : 'on'; setTimeout(() => (d.className = ''), 90); }, Math.max(0, (t - M.ctx.currentTime) * 1000));
+    M.next += 60 / M.bpm; M.beat = (M.beat + 1) % M.beats;
+  }
+}
+function metroStart() {
+  try { M.ctx ||= new (window.AudioContext || window.webkitAudioContext)(); } catch { return vtoast('Este navegador no permite sonido'); }
+  M.ctx.resume(); M.on = true; M.beat = 0; M.next = M.ctx.currentTime + 0.06; clearInterval(M.timer); M.timer = setInterval(metroTick, 25); metroTick(); metroUI();
+}
+function metroStop() { M.on = false; clearInterval(M.timer); metroUI(); }
+$('#vMetro').onclick = () => { const p = $('#metro'); p.hidden = !p.hidden; $('#vMetro').setAttribute('aria-pressed', !p.hidden); if (!p.hidden) setDraw(false); };
+$('#mPlay').onclick = () => (M.on ? metroStop() : metroStart());
+$('#mMinus').onclick = () => setBpm(M.bpm - 1); $('#mPlus').onclick = () => setBpm(M.bpm + 1);
+$('#mbpmR').oninput = (e) => setBpm(+e.target.value);
+$('#mbeats').onchange = (e) => { M.beats = +e.target.value; M.beat = 0; setBpm(M.bpm); };
+$('#mTap').onclick = () => {
+  const now = performance.now(); M.taps = M.taps.filter((t) => now - t < 2000); M.taps.push(now);
+  if (M.taps.length >= 2) { const iv = (M.taps[M.taps.length - 1] - M.taps[0]) / (M.taps.length - 1); setBpm(60000 / iv); }
+  if (M.taps.length > 6) M.taps.shift();
+};
+// los paneles no deben pasar de página al tocarlos
+['#drawbar', '#metro', '#vtop', '#vbot'].forEach((s) => $(s).addEventListener('click', (e) => e.stopPropagation()));
+
+// ---------- arranque ----------
+$('#tabLib').onclick = () => { S.tab = 'lib'; renderLib(); };
+$('#tabSets').onclick = () => { S.tab = 'sets'; renderLib(); };
+$('#q').oninput = (e) => { S.q = e.target.value; renderLib(); };
+$('#sortBtn').onclick = () => { S.sort = S.sort === 'az' ? 'recent' : 'az'; LS.set('atril.sort', S.sort); renderLib(); };
+$('#fab').onclick = () => { if (S.tab === 'sets') newSetSheet((s) => { S.openSet = s.id; renderLib(); }); else $('#file').click(); };
+$('#file').onchange = async (e) => { try { await importFiles(e.target.files); } catch (err) { toast('Error al importar: ' + (err.message || err), 4000); } e.target.value = ''; };
+document.addEventListener('dragover', (e) => e.preventDefault());
+document.addEventListener('drop', (e) => { e.preventDefault(); if (e.dataTransfer.files.length) importFiles(e.dataTransfer.files); });
+
+(async () => {
+  const ok = await Store.open();
+  if (!ok) { const w = $('#warn'); w.hidden = false; w.textContent = 'Este navegador no deja guardar archivos: las partituras se pierden al cerrar la página.'; }
+  else { try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {} }
+  try { await seedIfEmpty(); } catch {}
+  await refresh();
+})();
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
