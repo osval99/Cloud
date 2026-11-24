@@ -263,6 +263,19 @@ eligiendo Sucursal y Depósito en cada remito (no hace falta loguearse en LIBRER
   ficha en "Selección de libros" (el detalle muestra el código interno). Aunque se seleccionen varias, Aceptar agrega
   **solo una**: repetir por ficha. Al guardar, Fierro exige elegir un tipo de paquete.
 
+## Facturas de Riverside (RIV) en La Mandrágora
+
+- Llega un resumen "Pendientes de imputación de ventas" (PDF de Riverside Agency): FVF = factura en firme, FVC = de
+  consignación (en Fierro: tipo **Baja Consignación**). Todo se carga en La Mandrágora y viene por **SINLI**.
+- Compras > Facturas > ícono **FC**, proveedor `RIV` + Tab → bandeja SINLI → elegir "Factura B0027000xxxxx" → Aceptar.
+  Fierro trae los renglones de a poco: esperar a que termine y comparar el total con el resumen.
+- Precios de LISTA MOSTRADOR: **No a las bajas, Sí a las subas** (criterio del usuario, 24/11/2026).
+- Revisar que todos los renglones tengan RE verde (y PB verde en las de consignación). Corregir **letra B** (SINLI pone C)
+  y **vencimiento = el del resumen**. Formas de Pago → "Ingresar pago de cuenta corriente". Aceptar → aviso de precio
+  distinto al del pedido de baja: Sí → guardar: Sí → marcar mensaje procesado: Sí.
+- 24/11/2026: cargadas FC B 0027-32003, 32127, 32204, 32380, 32383, 32502, 32731 (firme) y 32563, 32704 (baja consig.).
+  En SINLI quedan sin cargar 32097 (22/09), 32479 (03/11) y 32713 (12/11), que no figuran en el resumen.
+
 ## Imprenta de ediciones propias (GRAFICA LAF)
 
 - Criterio del usuario (12/11/2026): las facturas de imprenta van como **proveedor normal** en Compras > Facturas >
