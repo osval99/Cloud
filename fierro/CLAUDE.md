@@ -237,6 +237,11 @@ Método acordado con el usuario (comando `/reposicion`):
   25/11/2026: **OP 4970** sin asignar pagos, $7.266.495 (FC 46099 4.697.445; FR 8411 parcial 1.956.250; FR 8415 parcial
   397.800; FC 8445 225.000; NG 5487 −10.000). El resumen pedía $7.298.195: faltan en Fierro FC 32-8577 y NC 28-10181,
   32-5474, 32-5475, 32-5488, 32-5489; la 8445 tiene aplicado nuestro CD 513 ($90.000) que Planeta no reconoce.
+  Ese día se cargaron como **NG** (Compras > Créditos > ícono NG, Sucursal LIBRERIA, `PLA` + Tab): 28-10181 (22/10,
+  $27.350, devolución 155862, motivo "Derecho devolución"), 32-5474 (29/10, $122.400, dif. de precio FB 8445, "Error de
+  facturación"), 32-5475 (29/10, $1.804.800, dif. de precio FB 8411), 32-5488 ($12.500) y 32-5489 ($2.500) (03/11,
+  "Derecho devolución"). PDFs en `facturas/planeta/lib_2511/`. **FC 32-8577 sin cargar**: su remito 22-000001361 (24/07,
+  366 ej., saldos) no está en Fierro. Una OP guardada no se puede modificar (solo eliminar y rehacer).
 
 ## Remitos de consignación de Planeta, PRH y Santillana: LIBRERIA → La Mandrágora
 
