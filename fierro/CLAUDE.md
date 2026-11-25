@@ -230,6 +230,13 @@ Método acordado con el usuario (comando `/reposicion`):
   0028-46382 (remito 20-000186584): remitos no ingresados.
 - 5/11/2026: FC B 00028-00046099 (13/10, $4.697.445,00, 242 ej.) y FC B 00028-00046234 (28/10, $2.274.600,00,
   108 ej., generó crédito CD 523, saldo $2.118.000). La 00028-00045701 ya estaba.
+- **Resumen de cuenta 1005707 y OP** (mismo mail de Mariano Fucile que el de DIS; el PDF sin "(DISTRIBUIDORA)"). Tiene dos
+  partes: LIB.TRADICIONAL (cierre 15) y NUEVOS NEGOCIOS (saldos 0032, **en cuotas**, cierre 20: la misma factura se repite
+  en cada período; se paga con **Pago parcial** por la suma de las cuotas vencidas). OP con Sucursal LIBRERIA, `PLA` + Enter.
+  Para encontrar filas en la lista de débitos: clic en una fila y bajar con Down (la rueda saltea filas).
+  25/11/2026: **OP 4970** sin asignar pagos, $7.266.495 (FC 46099 4.697.445; FR 8411 parcial 1.956.250; FR 8415 parcial
+  397.800; FC 8445 225.000; NG 5487 −10.000). El resumen pedía $7.298.195: faltan en Fierro FC 32-8577 y NC 28-10181,
+  32-5474, 32-5475, 32-5488, 32-5489; la 8445 tiene aplicado nuestro CD 513 ($90.000) que Planeta no reconoce.
 
 ## Remitos de consignación de Planeta, PRH y Santillana: LIBRERIA → La Mandrágora
 
