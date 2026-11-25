@@ -184,6 +184,11 @@ Método acordado con el usuario (comando `/reposicion`):
 - 20/11/2026: faltaban FG 0028-45479, 45537, 45547, 45563 y NG 9920, 9943, 9980, 10001 (agosto) → cargadas
   (`Cargado DIS 20-11-2026.csv`). OP 4949 (vto. noviembre, $6.472.000) guardada **sin asignar pagos** (Fierro lo permite: estado
   "Sin asignar pagos"). Cuando el usuario paga: Órdenes de pago/Recibos > buscar la OP > ícono **$** "Asignar la forma de pago a la Orden de Pago".
+- 25/11/2026 (contra el resumen 1006187 del 13/11): faltaban las FG de saldos 0032 de julio, que no tenían cargadas sus cuotas →
+  cargadas FG B 0032-8412 (20/07, $637.000, 490 ej., remito 22-000001336), 8413 ($627.900, 483 ej., rem. 1337), 8414 ($897.000,
+  690 ej., rem. 1338), 8561 (24/07, $995.800, 766 ej., rem. 1344), 8562 ($1.296.100, 997 ej., rem. 1345), todas vto 15/11 y
+  descripción "saldos, cuotas 15/11 15/12 15/01 15/02", y NG 0032-5160 (14/08, $421.200, 324 ej., Faltantes de la FB 8562).
+  PDFs en `facturas/planeta/dis_2511/`. La FG 0028-46505 (16/11) no figura en ese resumen.
 
 ## Facturas de Planeta (SINLI) en LIBRERIA
 
