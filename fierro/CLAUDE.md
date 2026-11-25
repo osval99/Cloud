@@ -234,7 +234,7 @@ Método acordado con el usuario (comando `/reposicion`):
   partes: LIB.TRADICIONAL (cierre 15) y NUEVOS NEGOCIOS (saldos 0032, **en cuotas**, cierre 20: la misma factura se repite
   en cada período; se paga con **Pago parcial** por la suma de las cuotas vencidas). OP con Sucursal LIBRERIA, `PLA` + Enter.
   Para encontrar filas en la lista de débitos: clic en una fila y bajar con Down (la rueda saltea filas).
-  25/11/2026: **OP 4970** sin asignar pagos, $7.266.495 (FC 46099 4.697.445; FR 8411 parcial 1.956.250; FR 8415 parcial
+  25/11/2026: OP 4970 (borrada y rehecha como **OP 4971**, ver abajo) sin asignar pagos, $7.266.495 (FC 46099 4.697.445; FR 8411 parcial 1.956.250; FR 8415 parcial
   397.800; FC 8445 225.000; NG 5487 −10.000). El resumen pedía $7.298.195: faltan en Fierro FC 32-8577 y NC 28-10181,
   32-5474, 32-5475, 32-5488, 32-5489; la 8445 tiene aplicado nuestro CD 513 ($90.000) que Planeta no reconoce.
   Ese día se cargaron (Sucursal LIBRERIA, `PLA` + Tab): **NC con sus libros** (ícono NC, a mano; el usuario pidió que en
@@ -243,6 +243,9 @@ Método acordado con el usuario (comando `/reposicion`):
   autoasignación al CD 523, que es otra cosa). Como **NG** (no traen libros, "DIFERENCIA DE PRECIO"): 32-5474 (29/10,
   $122.400, FB 8445) y 32-5475 (29/10, $1.804.800, FB 8411). PDFs en `facturas/planeta/lib_2511/`. **FC 32-8577 sin
   cargar**: su remito 22-000001361 (24/07, 366 ej., saldos) no está en Fierro. Una OP guardada no se puede modificar (solo eliminar y rehacer).
+  **OP 4971** (25/11, sin asignar pagos, **$7.123.445**): la 4970 + NC 10181 (saldo $5.650: el resto ya compensó nuestros
+  CD 520 y 516), NG 5474, NC 5488 y 5489. Contra los $7.298.195 del resumen faltan $174.750 = cuota FC 8577 118.950 +
+  CD 513 90.000 − parte de la 10181 ya usada 21.700 − RC 1380 12.500.
 
 ## Remitos de consignación de Planeta, PRH y Santillana: LIBRERIA → La Mandrágora
 
