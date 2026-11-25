@@ -90,6 +90,12 @@ Método acordado con el usuario (comando `/reposicion`):
 - Cargada así: FG B 00016-00081462 (24/08/2026, $877.939,70, 46 ej.) el 3/11/2026.
 - 20/11/2026 (resumen de cuenta de Camila Andrada): FG B 00016-00081809 ($965.827,50, 50 ej.), 00016-00082548
   ($1.133.520,30, 54 ej.) y 00016-00082964 ($845.053,55, 39 ej.). Quilmes se ve en "Domicilio/Localidad" del PDF.
+- **Resumen de cuenta PRH** (Camila Andrada, Cobranzas, imagen adjunta): se paga lo vencido del mes. OP en Compras >
+  Órdenes de Pago/Recibos > ícono OP, **Sucursal** según la factura (DISTRIBUIDORA = Quilmes, LIBRERIA = Rosario),
+  `SUD` + Enter. Se guardan **sin asignar pagos** si el usuario no da la transferencia.
+  Noviembre 2026: FG 81809 (DIS) pagada con OP 4951; **OP 4968** (25/11, LIBRERIA, sin asignar pagos, $7.364.965,50:
+  FC 81634, 82441, 82052, 82061). PRH pide $9.299,40 más por la 82441 (crédito CD 526, Pokemon sin remito, a la espera
+  de NC): se paga el total de PRH y el sobrante queda a favor en la OP.
 
 ## Pedidos de RC para PRH (DISTRIBUIDORA): reenvío por mail
 
