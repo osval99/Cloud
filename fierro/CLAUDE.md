@@ -126,6 +126,8 @@ Método acordado con el usuario (comando `/reposicion`):
 - 16/11/2026: FG 14-00000461 MATTIA (Mariano Alejandro Mattia, Exento) $225.120, 8 ej.; FG 14-00000462 Le Club
   (cliente nuevo **17750**, LE CLUB de Osvaldo Osorio y Beatriz Leda, CUIT 30-64863692-6, Resp. inscripto, San Martín
   950 Mendoza, **sin verificar en ARCA**) $278.400, 10 ej. Ambas contado, cta. cte., enviadas a RC.
+- 27/11/2026: FG 14-00000470 GROV (Groverman Daireaux F, Exento) $1.763.700, 77 ej., contado, enviada a RC.
+  Hecha en `:7` (en `:5` había trabajo abierto en La Mandrágora); el login de `:7` ya trae usuario y clave guardados.
 - Cliente **Persona** (CUIT 20-/27-): el asistente no tiene nombre de fantasía ni contacto (la descripción queda
   "Nombre Apellido"). Pasos: Persona + Con cuenta corriente → nombre, apellido, DNI, IVA, CUIT → dirección → Condición
   Base → límites 0 → Tipo CLIENTE MAYORISTA → grupo GPO.CLIENTES DISTRIBUIDORA → Finish.
